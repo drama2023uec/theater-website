@@ -77,7 +77,7 @@ function mapPost(page) {
     title: propertyText(properties, "Name") || "無題",
     date: formatPostDate(propertyText(properties, "Date")),
     category: propertyText(properties, "Category") || "稽古",
-    author: propertyText(properties, "Author") || "暁座",
+    author: propertyText(properties, "Author") || "演劇同好会",
     excerpt: propertyText(properties, "Excerpt") || propertyText(properties, "Description") || "",
   };
 }
