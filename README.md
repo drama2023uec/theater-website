@@ -31,7 +31,24 @@
 
 ## API連携時の差し替え位置
 
-現在は `script.js` の `shows` と `posts` がデモデータである。
-Next.jsやAstroへ移す場合は、この配列をNotion APIの取得結果に置き換える。
+現在は `script.js` にデモデータがあり、Notion APIが未設定でも表示が壊れない。
+本番では `/api/content` がNotion APIから公演情報とブログ記事を取得し、ブラウザ側がそれを読み込む。
 
 Notion APIキーはブラウザ側へ置かない。VercelやNetlifyの環境変数に保存し、サーバー側またはビルド時だけで読む。
+
+## Vercel環境変数
+
+VercelのProject Settings > Environment Variablesに以下を設定する。
+
+- `NOTION_API_KEY`: Notion Integrationの内部シークレット
+- `NOTION_POSTS_DATABASE_ID`: ブログDBのID
+- `NOTION_SHOWS_DATABASE_ID`: 公演DBのID
+
+設定後に再デプロイすればNotionの公開済みデータが反映される。
+
+## Notion側の必須操作
+
+1. https://www.notion.so/my-integrations でIntegrationを作成する
+2. 内部インテグレーションシークレットを `NOTION_API_KEY` に入れる
+3. ブログDBと公演DBの各ページ右上 `...` から `コネクトの追加` を選び、作成したIntegrationを接続する
+4. 各DBで `Published` がオンの行だけがサイトへ出る

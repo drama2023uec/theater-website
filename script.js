@@ -1,4 +1,4 @@
-const shows = [
+const fallbackShows = [
   {
     title: "夏季試演会「境界線の椅子」",
     date: "7.19",
@@ -22,7 +22,7 @@ const shows = [
   },
 ];
 
-const posts = [
+const fallbackPosts = [
   {
     title: "立ち稽古初日、椅子の位置だけで空気が変わった",
     date: "2026.06.12",
@@ -72,20 +72,22 @@ const postRoot = document.querySelector("[data-posts]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const header = document.querySelector("[data-header]");
 const spotlight = document.querySelector(".hero-spotlight");
+let currentShows = fallbackShows;
+let currentPosts = fallbackPosts;
 
 function renderShows() {
-  showRoot.innerHTML = shows
+  showRoot.innerHTML = currentShows
     .map(
       (show) => `
         <article class="show-card reveal">
           <div>
-            <div class="show-date">${show.date}<span>2026</span></div>
-            <h3>${show.title}</h3>
-            <p>${show.body}</p>
+            <div class="show-date">${escapeHtml(show.date)}<span>${escapeHtml(show.year || "2026")}</span></div>
+            <h3>${escapeHtml(show.title)}</h3>
+            <p>${escapeHtml(show.body)}</p>
           </div>
           <div class="card-footer">
-            <span>${show.venue}</span>
-            <span class="card-kicker">${show.status}</span>
+            <span>${escapeHtml(show.venue)}</span>
+            <span class="card-kicker">${escapeHtml(show.status)}</span>
           </div>
         </article>
       `
@@ -94,19 +96,19 @@ function renderShows() {
 }
 
 function renderPosts(category = "all") {
-  const visiblePosts = category === "all" ? posts : posts.filter((post) => post.category === category);
+  const visiblePosts = category === "all" ? currentPosts : currentPosts.filter((post) => post.category === category);
   postRoot.innerHTML = visiblePosts
     .map(
       (post) => `
         <article class="post-card reveal">
           <div>
-            <span class="card-kicker">${post.category}</span>
-            <h3>${post.title}</h3>
-            <p>${post.excerpt}</p>
+            <span class="card-kicker">${escapeHtml(post.category)}</span>
+            <h3>${escapeHtml(post.title)}</h3>
+            <p>${escapeHtml(post.excerpt)}</p>
           </div>
           <div class="card-footer">
-            <span>${post.date}</span>
-            <span>${post.author}</span>
+            <span>${escapeHtml(post.date)}</span>
+            <span>${escapeHtml(post.author)}</span>
           </div>
         </article>
       `
@@ -143,6 +145,34 @@ filterButtons.forEach((button) => {
   });
 });
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function loadContent() {
+  try {
+    const response = await fetch("/api/content", { headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`Content API returned ${response.status}`);
+
+    const data = await response.json();
+    if (data.configured) {
+      currentShows = Array.isArray(data.shows) && data.shows.length > 0 ? data.shows : fallbackShows;
+      currentPosts = Array.isArray(data.posts) && data.posts.length > 0 ? data.posts : fallbackPosts;
+    }
+  } catch (error) {
+    console.warn("Using fallback content.", error);
+  }
+
+  renderShows();
+  renderPosts(document.querySelector("[data-filter].active")?.dataset.filter || "all");
+  observeReveals();
+}
+
 window.addEventListener("scroll", () => {
   header.classList.toggle("is-solid", window.scrollY > 80);
 });
@@ -153,6 +183,4 @@ window.addEventListener("pointermove", (event) => {
   spotlight.style.setProperty("--y", `${event.clientY}px`);
 });
 
-renderShows();
-renderPosts();
-observeReveals();
+loadContent();
