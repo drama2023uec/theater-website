@@ -11,6 +11,7 @@
   --green: #2f6655;
   --blue: #315f78;
   --white: #ffffff;
+  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
 }
 
 * {
@@ -35,6 +36,19 @@ body::selection {
 
 a {
   color: inherit;
+}
+
+/* Mincho display for all headings (body and UI stay gothic) */
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-feature-settings: "palt" 1;
+}
+
+h3 {
+  font-weight: 600;
 }
 
 .site-header {
