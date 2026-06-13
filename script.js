@@ -92,13 +92,9 @@ function renderShows() {
     return;
   }
 
-  const posterPanelAttr = featured.flyerUrl
-    ? ` has-flyer-bg" style="--poster-bg: url('${escapeHtml(featured.flyerUrl)}')`
-    : "";
-
   showRoot.innerHTML = `
     <article class="featured-show-card program-feature reveal">
-      <div class="program-poster-panel${posterPanelAttr}">
+      <div class="program-poster-panel">
         <a class="flyer-link" href="${escapeHtml(showHref(featured))}">
           ${flyerHtml(featured, "large")}
         </a>
