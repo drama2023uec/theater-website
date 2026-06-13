@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>公演PR | 演劇同好会</title>
+    <meta name="description" content="演劇同好会の公演PRページ。公演日時、会場、紹介文を表示します。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="show-page">
+    <header class="site-header is-solid" data-header>
+      <a class="brand" href="./index.html#top" aria-label="演劇同好会 トップへ">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>演劇同好会</span>
+      </a>
+      <nav class="nav" aria-label="主要ナビゲーション">
+        <a href="./index.html#about">紹介</a>
+        <a href="./shows.html">公演</a>
+        <a href="./journal.html">稽古記録</a>
+        <a href="./index.html#join">参加</a>
+      </nav>
+    </header>
+
+    <main class="show-pr-shell">
+      <a class="back-link" href="./shows.html">公演一覧へ戻る</a>
+      <article class="show-pr" data-show>
+        <div class="show-pr-flyer" data-show-flyer></div>
+        <div class="show-pr-main">
+          <span class="card-kicker" data-show-status>読み込み中</span>
+          <h1 data-show-title>公演情報を読み込み中</h1>
+          <p class="show-pr-lead" data-show-body></p>
+          <div class="show-pr-actions">
+            <a class="button primary" href="mailto:drama2023uec@gmail.com" data-show-reservation>問い合わせる</a>
+            <a class="button secondary surface" href="./shows.html">過去公演を見る</a>
+          </div>
+        </div>
+        <aside class="show-ticket" aria-label="公演概要">
+          <span class="label">program</span>
+          <strong data-show-date>未定</strong>
+          <span data-show-year></span>
+          <dl>
+            <div>
+              <dt>会場</dt>
+              <dd data-show-venue>会場未定</dd>
+            </div>
+            <div>
+              <dt>状態</dt>
+              <dd data-show-ticket-status>公開中</dd>
+            </div>
+          </dl>
+        </aside>
+      </article>
+      <section class="show-pr-body" data-show-blocks></section>
+    </main>
+
+    <script src="./show.js"></script>
+  </body>
+</html>

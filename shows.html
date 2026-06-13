@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>公演アーカイブ | 演劇同好会</title>
+    <meta name="description" content="演劇同好会の公演アーカイブ。今後の公演と過去公演をまとめて表示します。" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="shows-page">
+    <header class="site-header is-solid" data-header>
+      <a class="brand" href="./index.html#top" aria-label="演劇同好会 トップへ">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>演劇同好会</span>
+      </a>
+      <nav class="nav" aria-label="主要ナビゲーション">
+        <a href="./index.html#about">紹介</a>
+        <a href="./shows.html">公演</a>
+        <a href="./journal.html">稽古記録</a>
+        <a href="./index.html#join">参加</a>
+      </nav>
+    </header>
+
+    <main class="shows-shell">
+      <section class="section shows-archive" aria-labelledby="shows-title">
+        <div class="section-heading">
+          <span class="label">program archive</span>
+          <h1 id="shows-title">公演アーカイブ</h1>
+          <p>公演ごとのPRページと、終了した公演の記録をまとめる。</p>
+        </div>
+
+        <section class="show-archive-block" aria-labelledby="upcoming-title">
+          <div class="archive-section-title">
+            <h2 id="upcoming-title">これからの公演</h2>
+            <span data-upcoming-count>0件</span>
+          </div>
+          <div class="show-list" data-upcoming-shows></div>
+        </section>
+
+        <section class="show-archive-block" aria-labelledby="past-title">
+          <div class="archive-section-title">
+            <h2 id="past-title">過去公演</h2>
+            <span data-past-count>0件</span>
+          </div>
+          <div class="show-list" data-past-shows></div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>演劇同好会</span>
+      <a href="./index.html#top">トップへ戻る</a>
+    </footer>
+
+    <script src="./shows.js"></script>
+  </body>
+</html>

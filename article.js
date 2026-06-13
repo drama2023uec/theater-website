@@ -1,0 +1,129 @@
+const titleEl = document.querySelector("[data-article-title]");
+const categoryEl = document.querySelector("[data-article-category]");
+const dateEl = document.querySelector("[data-article-date]");
+const authorEl = document.querySelector("[data-article-author]");
+const excerptEl = document.querySelector("[data-article-excerpt]");
+const bodyEl = document.querySelector("[data-article-body]");
+const likeButton = document.querySelector("[data-article-like]");
+const likeCountEl = document.querySelector("[data-article-likes]");
+let currentPostId = "";
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function blockHtml(block) {
+  const text = escapeHtml(block.text);
+
+  if (block.type === "heading_1") return `<h2>${text}</h2>`;
+  if (block.type === "heading_2") return `<h2>${text}</h2>`;
+  if (block.type === "heading_3") return `<h3>${text}</h3>`;
+  if (block.type === "quote") return `<blockquote>${text}</blockquote>`;
+  if (block.type === "bulleted_list_item") return `<ul><li>${text}</li></ul>`;
+  if (block.type === "numbered_list_item") return `<ol><li>${text}</li></ol>`;
+  return `<p>${text}</p>`;
+}
+
+function renderError(message) {
+  titleEl.textContent = "稽古記録を表示できません";
+  dateEl.textContent = "";
+  authorEl.textContent = "";
+  excerptEl.textContent = message;
+  bodyEl.innerHTML = "";
+  if (likeButton) likeButton.hidden = true;
+}
+
+function likeKey(id) {
+  return `drama-like:${id}`;
+}
+
+function hasLiked(id) {
+  return Boolean(id && window.localStorage?.getItem(likeKey(id)));
+}
+
+function setLiked(id, liked) {
+  if (!id) return;
+  if (liked) {
+    window.localStorage?.setItem(likeKey(id), "1");
+  } else {
+    window.localStorage?.removeItem(likeKey(id));
+  }
+}
+
+function renderLikeButton(post) {
+  if (!likeButton || !likeCountEl || !post.id) return;
+  const liked = hasLiked(post.id);
+  likeButton.hidden = false;
+  likeButton.disabled = false;
+  likeButton.classList.toggle("is-liked", liked);
+  const label = liked ? "いいねを取り消す" : "いいね";
+  likeButton.setAttribute("aria-label", label);
+  likeButton.setAttribute("title", label);
+  likeCountEl.textContent = Number(post.likes || 0);
+}
+
+async function likeArticle() {
+  if (!currentPostId) return;
+  const nextLiked = !hasLiked(currentPostId);
+
+  likeButton.disabled = true;
+  const response = await fetch("/api/like", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: currentPostId, liked: nextLiked }),
+  });
+
+  if (!response.ok) throw new Error(`Like API returned ${response.status}`);
+  const data = await response.json();
+  setLiked(currentPostId, Boolean(data.liked));
+  renderLikeButton({ id: currentPostId, likes: Number(data.likes || 0) });
+}
+
+async function loadArticle() {
+  const id = new URLSearchParams(window.location.search).get("id");
+  if (!id) {
+    renderError("記事IDが指定されていない。稽古記録一覧から開く必要がある。");
+    return;
+  }
+  currentPostId = id;
+
+  try {
+    const response = await fetch(`/api/post?id=${encodeURIComponent(id)}`, { cache: "no-store", headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`Post API returned ${response.status}`);
+    const post = await response.json();
+
+    document.title = `${post.title} | 演劇同好会`;
+    titleEl.textContent = post.title;
+    categoryEl.textContent = post.category;
+    dateEl.textContent = post.date;
+    authorEl.textContent = post.author;
+    excerptEl.textContent = post.excerpt;
+    renderLikeButton({ ...post, id });
+    bodyEl.innerHTML =
+      Array.isArray(post.blocks) && post.blocks.length > 0
+        ? post.blocks.map(blockHtml).join("")
+        : "<p>Notion本文はまだ空である。記事ページ本文に段落や見出しを追加すると、ここに反映される。</p>";
+  } catch (error) {
+    console.warn(error);
+    renderError("Notionの記事本文を取得できなかった。");
+  }
+}
+
+likeButton?.addEventListener("click", async () => {
+  try {
+    await likeArticle();
+  } catch (error) {
+    console.warn(error);
+    likeButton.disabled = false;
+  }
+});
+
+loadArticle();

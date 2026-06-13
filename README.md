@@ -20,6 +20,12 @@
 - `Excerpt`: 短い概要
 - `Published`: チェックボックス
 
+ブログ本文:
+
+- ブログDBの各行を開き、そのページ本文に段落や見出しを書く
+- サイトの稽古記録カードから `article.html` に遷移し、Notion本文が反映される
+- 対応ブロックは段落、見出し、箇条書き、番号付きリスト、引用
+
 公演DB:
 
 - `Name`: 公演名
@@ -45,6 +51,22 @@ VercelのProject Settings > Environment Variablesに以下を設定する。
 - `NOTION_SHOWS_DATABASE_ID`: 公演DBのID
 
 設定後に再デプロイすればNotionの公開済みデータが反映される。
+
+## GitHubへの保存
+
+Vercelへ直接デプロイするとGitHubには保存されない。変更を残すときは以下を使う。
+
+```bash
+./scripts/save-to-github.sh "変更内容のメモ"
+```
+
+本番デプロイまで一気に行う場合は以下を使う。
+
+```bash
+./scripts/deploy-prod.sh "変更内容のメモ"
+```
+
+このスクリプトはサイト本体だけをstageし、`.env*`, `.vercel/`, `.DS_Store`, `.claude/`, `outputs/`, `WORK_LOG_*.md` は保存対象から外す。
 
 ## Notion側の必須操作
 

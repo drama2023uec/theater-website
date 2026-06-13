@@ -18,8 +18,8 @@
       </a>
       <nav class="nav" aria-label="主要ナビゲーション">
         <a href="#about">紹介</a>
-        <a href="#shows">公演</a>
-        <a href="#journal">稽古記録</a>
+        <a href="./shows.html">公演</a>
+        <a href="./journal.html">稽古記録</a>
         <a href="#join">参加</a>
       </nav>
     </header>
@@ -36,8 +36,8 @@
             脚本から照明まで学生が担う演劇同好会。公演情報と稽古記録を、次の世代が迷わず更新できる形で残す。
           </p>
           <div class="hero-actions" aria-label="主要アクション">
-            <a class="button primary" href="#shows">次回公演を見る</a>
-            <a class="button secondary" href="#journal">稽古記録を読む</a>
+            <a class="button primary" href="./shows.html">公演を見る</a>
+            <a class="button secondary" href="./journal.html">稽古記録を読む</a>
           </div>
         </div>
       </section>
@@ -96,10 +96,13 @@
       </section>
 
       <section class="section shows" id="shows">
-        <div class="section-heading">
-          <span class="label">program</span>
-          <h2>公演情報</h2>
-          <p>Notionの「公演」データベースを想定したカード表示。日付、会場、状態だけを入力すれば反映できる。</p>
+        <div class="section-heading with-controls">
+          <div>
+            <span class="label">program</span>
+            <h2>公演情報</h2>
+            <p>最新3件の公演を表示する。各カードからPRページへ進める。</p>
+          </div>
+          <a class="button secondary surface" href="./shows.html">過去公演をすべて見る</a>
         </div>
         <div class="show-grid" data-shows></div>
       </section>
@@ -118,7 +121,11 @@
             <button type="button" data-filter="告知" role="tab" aria-selected="false">告知</button>
           </div>
         </div>
+        <div class="pickup-panel" data-pickup></div>
         <div class="post-grid" data-posts></div>
+        <div class="journal-actions">
+          <a class="button primary" href="./journal.html">稽古記録をすべて見る</a>
+        </div>
       </section>
 
       <section class="section system" aria-labelledby="system-title">
