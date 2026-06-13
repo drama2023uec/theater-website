@@ -231,19 +231,9 @@ function postCardHtml(post) {
   `;
 }
 
-function pickupPost() {
-  if (!currentPosts.length) return null;
-  return [...currentPosts].sort((a, b) => Number(b.likes || 0) - Number(a.likes || 0))[0];
-}
-
-function postKey(post) {
-  return post ? post.id || post.title : "";
-}
-
 function renderPosts(category = currentFilter) {
   currentFilter = category;
-  const featuredKey = postKey(pickupPost());
-  const matchingPosts = filteredPosts(category).filter((post) => postKey(post) !== featuredKey);
+  const matchingPosts = filteredPosts(category);
   const visiblePosts = matchingPosts.slice(0, 3);
 
   postRoot.innerHTML = visiblePosts.map(postCardHtml).join("");
@@ -253,12 +243,12 @@ function renderPosts(category = currentFilter) {
 
 function renderPickup() {
   if (!pickupRoot) return;
-  const picked = pickupPost();
-  if (!picked) {
+  if (!currentPosts.length) {
     pickupRoot.innerHTML = "";
     return;
   }
 
+  const picked = [...currentPosts].sort((a, b) => Number(b.likes || 0) - Number(a.likes || 0))[0];
   pickupRoot.innerHTML = `
     <a class="pickup-card home-pickup-card reveal" href="${escapeHtml(postHref(picked))}">
       <div class="home-pickup-copy">

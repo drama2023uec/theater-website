@@ -72,15 +72,6 @@ function filteredPosts() {
   return currentFilter === "all" ? currentPosts : currentPosts.filter((post) => post.category === currentFilter);
 }
 
-function pickupPost() {
-  if (!currentPosts.length) return null;
-  return [...currentPosts].sort((a, b) => Number(b.likes || 0) - Number(a.likes || 0))[0];
-}
-
-function postKey(post) {
-  return post ? post.id || post.title : "";
-}
-
 function postHref(post) {
   return post.href || (post.id ? `/article.html?id=${encodeURIComponent(post.id)}` : "./journal.html");
 }
@@ -137,7 +128,7 @@ function renderPickup() {
     return;
   }
 
-  const picked = pickupPost();
+  const picked = [...currentPosts].sort((a, b) => Number(b.likes || 0) - Number(a.likes || 0))[0];
   pickupRoot.innerHTML = `
     <a class="pickup-card reveal" href="${escapeHtml(postHref(picked))}">
       <span class="label">pick up</span>
@@ -169,8 +160,7 @@ function renderPagination(totalPages) {
 }
 
 function renderPosts() {
-  const featuredKey = postKey(pickupPost());
-  const posts = filteredPosts().filter((post) => postKey(post) !== featuredKey);
+  const posts = filteredPosts();
   const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
   currentPage = Math.min(currentPage, totalPages);
   const start = (currentPage - 1) * POSTS_PER_PAGE;

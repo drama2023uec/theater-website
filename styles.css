@@ -1,19 +1,16 @@
 :root {
-  color-scheme: dark;
-  --ink: #f4ede1;          /* primary text, lit on the dark stage */
-  --paper: #14110e;        /* page surface: the black box */
-  --paper-strong: #221d19; /* raised panels and cards on the stage */
-  --muted: rgba(244, 237, 225, 0.56);
-  --line: rgba(244, 237, 225, 0.13);
-  --stage: #100c0a;        /* deepest dark: hero base, footer, ticket */
-  --amber: #e3a73f;        /* stage-light amber — the spotlight */
-  --red: #d4576c;          /* curtain crimson, lifted to read on dark */
-  --green: #5aa98f;
-  --blue: #5f97b4;
+  color-scheme: light;
+  --ink: #171412;
+  --paper: #f6f0e8;
+  --paper-strong: #fffaf2;
+  --muted: #6d655d;
+  --line: rgba(23, 20, 18, 0.16);
+  --stage: #111111;
+  --amber: #d98f35;
+  --red: #8f2634;
+  --green: #2f6655;
+  --blue: #315f78;
   --white: #ffffff;
-  --script: #f3ead9;       /* script-paper cream: used sparingly as accent */
-  --script-ink: #211c17;   /* ink on script paper */
-  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
 }
 
 * {
@@ -40,19 +37,6 @@ a {
   color: inherit;
 }
 
-/* Mincho display: headlines are lit type on the dark stage; body/UI stays gothic */
-h1,
-h2,
-h3 {
-  font-family: var(--display);
-  font-weight: 700;
-  font-feature-settings: "palt" 1;
-}
-
-h3 {
-  font-weight: 600;
-}
-
 .site-header {
   position: fixed;
   z-index: 20;
@@ -69,7 +53,7 @@ h3 {
 }
 
 .site-header.is-solid {
-  background: rgba(16, 12, 10, 0.82);
+  background: rgba(246, 240, 232, 0.94);
   color: var(--ink);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(16px);
@@ -233,8 +217,8 @@ h3 {
 }
 
 .button.dark {
-  background: var(--script);
-  color: var(--script-ink);
+  background: var(--ink);
+  color: var(--white);
 }
 
 .intro-band {
@@ -323,10 +307,6 @@ h3 {
   grid-template-columns: repeat(3, 1fr);
   border: 1px solid var(--line);
   background: var(--paper-strong);
-}
-
-.metrics.two {
-  grid-template-columns: repeat(2, 1fr);
 }
 
 .metrics div {
@@ -456,8 +436,8 @@ h3 {
 .program-facts {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 16px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid rgba(23, 20, 18, 0.12);
+  border-bottom: 1px solid rgba(23, 20, 18, 0.12);
 }
 
 .show-facts div {
@@ -491,7 +471,7 @@ h3 {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(244, 237, 225, 0.03);
+  background: #ffffff;
 }
 
 .program-next-header {
@@ -572,17 +552,15 @@ h3 {
 }
 
 .poster-fallback {
-  padding: 22px 18px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   background:
-    radial-gradient(130% 70% at 50% -10%, rgba(227, 167, 63, 0.22), transparent 62%),
-    var(--stage);
-  box-shadow: inset 0 0 0 1px rgba(227, 167, 63, 0.32);
-  color: var(--ink);
-  text-align: center;
+    linear-gradient(135deg, rgba(217, 143, 53, 0.92), rgba(143, 38, 52, 0.92)),
+    var(--ink);
+  color: var(--white);
 }
 
 .poster-fallback span,
@@ -590,20 +568,12 @@ h3 {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-weight: 900;
+  letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
-}
-
-.poster-fallback span {
-  color: var(--amber);
-}
-
-.poster-fallback em {
-  color: var(--muted);
 }
 
 .poster-fallback strong {
@@ -611,11 +581,8 @@ h3 {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 5;
-  margin: auto 0;
-  font-family: var(--display);
-  font-weight: 700;
-  font-size: clamp(18px, 4vw, 32px);
-  line-height: 1.18;
+  font-size: clamp(18px, 4vw, 34px);
+  line-height: 1.12;
 }
 
 .mini-show-card .poster-fallback {
@@ -644,9 +611,9 @@ h3 {
   align-items: center;
   gap: 22px;
   padding: 24px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(143, 38, 52, 0.24);
   border-radius: 8px;
-  background: var(--paper-strong);
+  background: #fff6e8;
   color: inherit;
   text-decoration: none;
   transition: transform 180ms ease, box-shadow 180ms ease;
@@ -689,7 +656,7 @@ h3 {
   gap: 28px;
   padding: 0;
   overflow: hidden;
-  border-color: var(--line);
+  border-color: rgba(23, 20, 18, 0.12);
   background: var(--paper-strong);
 }
 
@@ -734,8 +701,8 @@ h3 {
   place-items: center;
   align-content: center;
   gap: 2px;
-  border-left: 1px solid var(--line);
-  background: var(--stage);
+  border-left: 1px solid rgba(23, 20, 18, 0.1);
+  background: #ffffff;
   color: var(--red);
   text-align: center;
 }
@@ -792,9 +759,8 @@ h3 {
   border-radius: 8px;
   display: grid;
   place-items: center;
-  background: var(--stage);
-  color: var(--ink);
-  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--white);
   font-weight: 900;
   line-height: 1.05;
   text-align: center;
@@ -845,10 +811,9 @@ h3 {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--amber);
-  color: var(--stage);
+  background: var(--ink);
+  color: var(--white);
   font-size: 11px;
-  font-weight: 800;
   line-height: 1;
 }
 
@@ -1052,7 +1017,7 @@ h3 {
 }
 
 .archive-page {
-  background: var(--paper);
+  background: #ffffff;
 }
 
 .archive-shell {
@@ -1060,7 +1025,7 @@ h3 {
 }
 
 .archive-page .site-header.is-solid {
-  background: rgba(16, 12, 10, 0.86);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 .archive-page .archive-hero {
@@ -1069,7 +1034,7 @@ h3 {
 
 .archive-page .section-heading.with-controls {
   padding-bottom: 28px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(23, 20, 18, 0.1);
 }
 
 .archive-hero h1 {
@@ -1105,9 +1070,9 @@ h3 {
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 18px;
   border: 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(23, 20, 18, 0.1);
   border-radius: 0;
-  background: transparent;
+  background: #ffffff;
 }
 
 .archive-page .post-card:hover {
@@ -1156,8 +1121,8 @@ h3 {
   min-height: 0;
   display: block;
   padding: 20px;
-  border-color: var(--line);
-  background: var(--paper-strong);
+  border-color: rgba(23, 20, 18, 0.1);
+  background: #fafafa;
 }
 
 .archive-page .pickup-card:hover {
@@ -1209,18 +1174,18 @@ h3 {
 }
 
 .pagination button.active {
-  background: var(--amber);
-  color: var(--stage);
+  background: var(--ink);
+  color: var(--white);
 }
 
 .shows-page,
 .show-page {
-  background: var(--paper);
+  background: #ffffff;
 }
 
 .shows-page .site-header.is-solid,
 .show-page .site-header.is-solid {
-  background: rgba(16, 12, 10, 0.86);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 .shows-shell,
@@ -1244,7 +1209,7 @@ h3 {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(23, 20, 18, 0.12);
 }
 
 .archive-section-title h2 {
@@ -1328,9 +1293,9 @@ h3 {
   gap: 38px;
   align-items: stretch;
   padding: 42px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(23, 20, 18, 0.12);
   border-radius: 8px;
-  background: var(--paper-strong);
+  background: #fffaf2;
 }
 
 .show-pr-flyer {
@@ -1364,7 +1329,7 @@ h3 {
   flex-direction: column;
   justify-content: space-between;
   border-radius: 8px;
-  background: var(--stage);
+  background: var(--ink);
   color: var(--white);
 }
 
@@ -1437,7 +1402,7 @@ h3 {
 
 .archive-page .segmented {
   border-radius: 999px;
-  background: rgba(244, 237, 225, 0.05);
+  background: #f7f7f7;
 }
 
 .archive-page .segmented button {
@@ -1452,7 +1417,7 @@ h3 {
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(244, 237, 225, 0.04);
+  background: var(--paper-strong);
 }
 
 .segmented button {
@@ -1468,8 +1433,8 @@ h3 {
 }
 
 .segmented button.active {
-  background: var(--amber);
-  color: var(--stage);
+  background: var(--ink);
+  color: var(--white);
 }
 
 .system {
@@ -1493,7 +1458,7 @@ h3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   background: rgba(23, 20, 18, 0.18);
-  border: 1px solid var(--line);
+  border: 1px solid rgba(23, 20, 18, 0.18);
 }
 
 .flow li {
@@ -1536,9 +1501,8 @@ h3 {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  background: var(--stage);
-  border-top: 1px solid var(--line);
-  color: var(--muted);
+  background: var(--ink);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 13px;
 }
 
@@ -1632,7 +1596,7 @@ h3 {
     display: flex;
     justify-content: flex-start;
     border-left: 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid rgba(23, 20, 18, 0.1);
   }
 
   .home-pickup-score strong {
@@ -1744,8 +1708,7 @@ h3 {
     font-size: 28px;
   }
 
-  .metrics,
-  .metrics.two {
+  .metrics {
     grid-template-columns: 1fr;
   }
 
