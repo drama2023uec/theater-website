@@ -1,16 +1,19 @@
 :root {
-  color-scheme: light;
-  --ink: #171412;
-  --paper: #f6f0e8;
-  --paper-strong: #fffaf2;
-  --muted: #6d655d;
-  --line: rgba(23, 20, 18, 0.16);
-  --stage: #111111;
-  --amber: #d98f35;
-  --red: #8f2634;
-  --green: #2f6655;
-  --blue: #315f78;
+  color-scheme: dark;
+  --ink: #f4ede1;          /* primary text, lit on the dark stage */
+  --paper: #14110e;        /* page surface: the black box */
+  --paper-strong: #221d19; /* raised panels and cards on the stage */
+  --muted: rgba(244, 237, 225, 0.56);
+  --line: rgba(244, 237, 225, 0.13);
+  --stage: #100c0a;        /* deepest dark: hero base, footer, ticket */
+  --amber: #e3a73f;        /* stage-light amber — the spotlight */
+  --red: #d4576c;          /* curtain crimson, lifted to read on dark */
+  --green: #5aa98f;
+  --blue: #5f97b4;
   --white: #ffffff;
+  --script: #f3ead9;       /* script-paper cream: used sparingly as accent */
+  --script-ink: #211c17;   /* ink on script paper */
+  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
 }
 
 * {
@@ -37,6 +40,19 @@ a {
   color: inherit;
 }
 
+/* Mincho display: headlines are lit type on the dark stage; body/UI stays gothic */
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-feature-settings: "palt" 1;
+}
+
+h3 {
+  font-weight: 600;
+}
+
 .site-header {
   position: fixed;
   z-index: 20;
@@ -53,7 +69,7 @@ a {
 }
 
 .site-header.is-solid {
-  background: rgba(246, 240, 232, 0.94);
+  background: rgba(16, 12, 10, 0.82);
   color: var(--ink);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(16px);
@@ -217,8 +233,8 @@ a {
 }
 
 .button.dark {
-  background: var(--ink);
-  color: var(--white);
+  background: var(--script);
+  color: var(--script-ink);
 }
 
 .intro-band {
@@ -440,8 +456,8 @@ a {
 .program-facts {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 16px 0;
-  border-top: 1px solid rgba(23, 20, 18, 0.12);
-  border-bottom: 1px solid rgba(23, 20, 18, 0.12);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .show-facts div {
@@ -475,7 +491,7 @@ a {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #ffffff;
+  background: rgba(244, 237, 225, 0.03);
 }
 
 .program-next-header {
@@ -556,15 +572,17 @@ a {
 }
 
 .poster-fallback {
-  padding: 18px;
+  padding: 22px 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   background:
-    linear-gradient(135deg, rgba(217, 143, 53, 0.92), rgba(143, 38, 52, 0.92)),
-    var(--ink);
-  color: var(--white);
+    radial-gradient(130% 70% at 50% -10%, rgba(227, 167, 63, 0.22), transparent 62%),
+    var(--stage);
+  box-shadow: inset 0 0 0 1px rgba(227, 167, 63, 0.32);
+  color: var(--ink);
+  text-align: center;
 }
 
 .poster-fallback span,
@@ -572,12 +590,20 @@ a {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 12px;
+  font-size: 11px;
   font-style: normal;
-  font-weight: 900;
-  letter-spacing: 0;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.poster-fallback span {
+  color: var(--amber);
+}
+
+.poster-fallback em {
+  color: var(--muted);
 }
 
 .poster-fallback strong {
@@ -585,8 +611,11 @@ a {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 5;
-  font-size: clamp(18px, 4vw, 34px);
-  line-height: 1.12;
+  margin: auto 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(18px, 4vw, 32px);
+  line-height: 1.18;
 }
 
 .mini-show-card .poster-fallback {
@@ -615,9 +644,9 @@ a {
   align-items: center;
   gap: 22px;
   padding: 24px;
-  border: 1px solid rgba(143, 38, 52, 0.24);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff6e8;
+  background: var(--paper-strong);
   color: inherit;
   text-decoration: none;
   transition: transform 180ms ease, box-shadow 180ms ease;
@@ -660,7 +689,7 @@ a {
   gap: 28px;
   padding: 0;
   overflow: hidden;
-  border-color: rgba(23, 20, 18, 0.12);
+  border-color: var(--line);
   background: var(--paper-strong);
 }
 
@@ -705,8 +734,8 @@ a {
   place-items: center;
   align-content: center;
   gap: 2px;
-  border-left: 1px solid rgba(23, 20, 18, 0.1);
-  background: #ffffff;
+  border-left: 1px solid var(--line);
+  background: var(--stage);
   color: var(--red);
   text-align: center;
 }
@@ -763,8 +792,9 @@ a {
   border-radius: 8px;
   display: grid;
   place-items: center;
-  background: var(--ink);
-  color: var(--white);
+  background: var(--stage);
+  color: var(--ink);
+  border: 1px solid var(--line);
   font-weight: 900;
   line-height: 1.05;
   text-align: center;
@@ -815,9 +845,10 @@ a {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--ink);
-  color: var(--white);
+  background: var(--amber);
+  color: var(--stage);
   font-size: 11px;
+  font-weight: 800;
   line-height: 1;
 }
 
@@ -1021,7 +1052,7 @@ a {
 }
 
 .archive-page {
-  background: #ffffff;
+  background: var(--paper);
 }
 
 .archive-shell {
@@ -1029,7 +1060,7 @@ a {
 }
 
 .archive-page .site-header.is-solid {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(16, 12, 10, 0.86);
 }
 
 .archive-page .archive-hero {
@@ -1038,7 +1069,7 @@ a {
 
 .archive-page .section-heading.with-controls {
   padding-bottom: 28px;
-  border-bottom: 1px solid rgba(23, 20, 18, 0.1);
+  border-bottom: 1px solid var(--line);
 }
 
 .archive-hero h1 {
@@ -1074,9 +1105,9 @@ a {
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 18px;
   border: 0;
-  border-bottom: 1px solid rgba(23, 20, 18, 0.1);
+  border-bottom: 1px solid var(--line);
   border-radius: 0;
-  background: #ffffff;
+  background: transparent;
 }
 
 .archive-page .post-card:hover {
@@ -1125,8 +1156,8 @@ a {
   min-height: 0;
   display: block;
   padding: 20px;
-  border-color: rgba(23, 20, 18, 0.1);
-  background: #fafafa;
+  border-color: var(--line);
+  background: var(--paper-strong);
 }
 
 .archive-page .pickup-card:hover {
@@ -1178,18 +1209,18 @@ a {
 }
 
 .pagination button.active {
-  background: var(--ink);
-  color: var(--white);
+  background: var(--amber);
+  color: var(--stage);
 }
 
 .shows-page,
 .show-page {
-  background: #ffffff;
+  background: var(--paper);
 }
 
 .shows-page .site-header.is-solid,
 .show-page .site-header.is-solid {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(16, 12, 10, 0.86);
 }
 
 .shows-shell,
@@ -1213,7 +1244,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  border-bottom: 1px solid rgba(23, 20, 18, 0.12);
+  border-bottom: 1px solid var(--line);
 }
 
 .archive-section-title h2 {
@@ -1297,9 +1328,9 @@ a {
   gap: 38px;
   align-items: stretch;
   padding: 42px;
-  border: 1px solid rgba(23, 20, 18, 0.12);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fffaf2;
+  background: var(--paper-strong);
 }
 
 .show-pr-flyer {
@@ -1333,7 +1364,7 @@ a {
   flex-direction: column;
   justify-content: space-between;
   border-radius: 8px;
-  background: var(--ink);
+  background: var(--stage);
   color: var(--white);
 }
 
@@ -1406,7 +1437,7 @@ a {
 
 .archive-page .segmented {
   border-radius: 999px;
-  background: #f7f7f7;
+  background: rgba(244, 237, 225, 0.05);
 }
 
 .archive-page .segmented button {
@@ -1421,7 +1452,7 @@ a {
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--paper-strong);
+  background: rgba(244, 237, 225, 0.04);
 }
 
 .segmented button {
@@ -1437,8 +1468,8 @@ a {
 }
 
 .segmented button.active {
-  background: var(--ink);
-  color: var(--white);
+  background: var(--amber);
+  color: var(--stage);
 }
 
 .system {
@@ -1462,7 +1493,7 @@ a {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   background: rgba(23, 20, 18, 0.18);
-  border: 1px solid rgba(23, 20, 18, 0.18);
+  border: 1px solid var(--line);
 }
 
 .flow li {
@@ -1505,8 +1536,9 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  background: var(--ink);
-  color: rgba(255, 255, 255, 0.72);
+  background: var(--stage);
+  border-top: 1px solid var(--line);
+  color: var(--muted);
   font-size: 13px;
 }
 
@@ -1600,7 +1632,7 @@ a {
     display: flex;
     justify-content: flex-start;
     border-left: 0;
-    border-top: 1px solid rgba(23, 20, 18, 0.1);
+    border-top: 1px solid var(--line);
   }
 
   .home-pickup-score strong {
