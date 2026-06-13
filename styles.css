@@ -309,6 +309,10 @@ a {
   background: var(--paper-strong);
 }
 
+.metrics.two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .metrics div {
   min-height: 160px;
   padding: 22px;
@@ -1708,7 +1712,8 @@ a {
     font-size: 28px;
   }
 
-  .metrics {
+  .metrics,
+  .metrics.two {
     grid-template-columns: 1fr;
   }
 
