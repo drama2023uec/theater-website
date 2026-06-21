@@ -8,6 +8,29 @@ const venueEl = document.querySelector("[data-show-venue]");
 const blocksEl = document.querySelector("[data-show-blocks]");
 const flyerEl = document.querySelector("[data-show-flyer]");
 const reservationEl = document.querySelector("[data-show-reservation]");
+const afterStatusEl = document.querySelector("[data-show-after-status]");
+const afterTitleEl = document.querySelector("[data-show-after-title]");
+const afterCopyEl = document.querySelector("[data-show-after-copy]");
+const afterReservationEl = document.querySelector("[data-show-after-reservation]");
+
+const fallbackShows = {
+  "37eb1f2b-73b5-8116-9723-e5938914e068": {
+    title: "電気通信大学演劇同好会 梅雨公演『潜る男』",
+    date: "7.1",
+    rawDate: "2026-07-01",
+    year: "2026",
+    status: "予約受付中",
+    venue: "調布市文化会館たづくり 11階 第1創作室",
+    body: "海の底で、ふたりは近づく。息を止めた先で、君を知る。電気通信大学演劇同好会の梅雨公演。新入生の活躍をご覧あれ。",
+    reservationUrl: "https://teket.jp/18495/70876",
+    blocks: [
+      { type: "heading_2", text: "公演について" },
+      { type: "paragraph", text: "電気通信大学演劇同好会による梅雨公演。静かな水底を思わせる世界で、人物同士の距離と沈黙を丁寧に立ち上げる。" },
+      { type: "heading_2", text: "来場案内" },
+      { type: "paragraph", text: "会場は調布市文化会館たづくり 11階 第1創作室。入場無料、事前予約制。予約はteketのページから受け付ける。" },
+    ],
+  },
+};
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -25,9 +48,31 @@ function blockHtml(block) {
   if (block.type === "heading_2") return `<h2>${text}</h2>`;
   if (block.type === "heading_3") return `<h3>${text}</h3>`;
   if (block.type === "quote") return `<blockquote>${text}</blockquote>`;
-  if (block.type === "bulleted_list_item") return `<ul><li>${text}</li></ul>`;
-  if (block.type === "numbered_list_item") return `<ol><li>${text}</li></ol>`;
+  if (block.type === "bulleted_list_item" || block.type === "numbered_list_item") return `<li>${text}</li>`;
   return `<p>${text}</p>`;
+}
+
+function blocksHtml(blocks) {
+  const html = [];
+  let activeList = "";
+
+  blocks.forEach((block) => {
+    const listType = block.type === "bulleted_list_item" ? "ul" : block.type === "numbered_list_item" ? "ol" : "";
+
+    if (listType && listType !== activeList) {
+      if (activeList) html.push(`</${activeList}>`);
+      html.push(`<${listType}>`);
+      activeList = listType;
+    } else if (!listType && activeList) {
+      html.push(`</${activeList}>`);
+      activeList = "";
+    }
+
+    html.push(blockHtml(block));
+  });
+
+  if (activeList) html.push(`</${activeList}>`);
+  return html.join("");
 }
 
 function renderError(message) {
@@ -44,6 +89,13 @@ function renderError(message) {
   reservationEl.textContent = "問い合わせる";
   reservationEl.removeAttribute("target");
   reservationEl.removeAttribute("rel");
+  afterStatusEl.textContent = "確認中";
+  afterTitleEl.textContent = "公演情報を確認できません";
+  afterCopyEl.textContent = message;
+  afterReservationEl.href = "mailto:drama2023uec@gmail.com";
+  afterReservationEl.textContent = "問い合わせる";
+  afterReservationEl.removeAttribute("target");
+  afterReservationEl.removeAttribute("rel");
 }
 
 function flyerHtml(show) {
@@ -60,51 +112,33 @@ function flyerHtml(show) {
   `;
 }
 
-async function loadShow() {
-  const id = new URLSearchParams(window.location.search).get("id");
-  if (!id) {
-    renderError("公演IDが指定されていない。公演一覧から開く必要がある。");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/show?id=${encodeURIComponent(id)}`, { cache: "no-store", headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(`Show API returned ${response.status}`);
-    const show = await response.json();
-
-    document.title = `${show.title} | 演劇同好会`;
-    titleEl.textContent = show.title;
-    statusEl.textContent = show.status;
-    ticketStatusEl.textContent = show.status;
-    bodyEl.textContent = show.body;
-    dateEl.textContent = show.date;
-    yearEl.textContent = show.year;
-    venueEl.textContent = show.venue;
-    flyerEl.innerHTML = flyerHtml(show);
-    if (show.reservationUrl) {
-      reservationEl.href = show.reservationUrl;
-      reservationEl.textContent = "予約ページへ";
-      reservationEl.target = "_blank";
-      reservationEl.rel = "noopener";
-    } else {
-      reservationEl.href = "mailto:drama2023uec@gmail.com";
-      reservationEl.textContent = "問い合わせる";
-      reservationEl.removeAttribute("target");
-      reservationEl.removeAttribute("rel");
-    }
-    blocksEl.innerHTML =
-      Array.isArray(show.blocks) && show.blocks.length > 0
-        ? show.blocks.map(blockHtml).join("")
-        : `
-          <h2>公演について</h2>
-          <p>${escapeHtml(show.body || "Notionの公演ページ本文を追加すると、ここにPR本文として反映される。")}</p>
-          <h2>来場案内</h2>
-          <p>会場、開演時刻、予約方法などはNotionの公演ページに追記して運用する。</p>
-        `;
-  } catch (error) {
-    console.warn(error);
-    renderError("Notionの公演情報を取得できなかった。");
-  }
-}
-
-loadShow();
+function renderShow(show) {
+  document.title = `${show.title} | 演劇同好会`;
+  titleEl.textContent = show.title;
+  statusEl.textContent = show.status;
+  ticketStatusEl.textContent = show.status;
+  bodyEl.textContent = show.body;
+  dateEl.textContent = show.date;
+  yearEl.textContent = show.year;
+  venueEl.textContent = show.venue;
+  flyerEl.innerHTML = flyerHtml(show);
+  afterStatusEl.textContent = show.status;
+  afterTitleEl.textContent = `${show.title}を予約する`;
+  afterCopyEl.textContent = `${show.date} ${show.year || ""} / ${show.venue}`;
+  if (show.reservationUrl) {
+    reservationEl.href = show.reservationUrl;
+    reservationEl.textContent = "予約ページへ";
+    reservationEl.target = "_blank";
+    reservationEl.rel = "noopener";
+    afterReservationEl.href = show.reservationUrl;
+    afterReservationEl.textContent = "予約ページへ";
+    afterReservationEl.target = "_blank";
+    afterReservationEl.rel = "noopener";
+  } else {
+    reservationEl.href = "mailto:drama2023uec@gmail.com";
+    reservationEl.textContent = "問い合わせる";
+    reservationEl.removeAttribute("target");
+    reservationEl.removeAttribute("rel");
+    afterReservationEl.href = "mailto:drama2023uec@gmail.com";
+    afterReservationEl.textContent = "問い合わせる";
+    afterReservationEl.removeAttribute("t

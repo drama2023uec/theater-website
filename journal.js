@@ -76,6 +76,25 @@ function postHref(post) {
   return post.href || (post.id ? `/article.html?id=${encodeURIComponent(post.id)}` : "./journal.html");
 }
 
+function postLikeId(post) {
+  if (post.id) return post.id;
+  return `fallback:${post.date}:${post.title}`;
+}
+
+function postLikeCount(post) {
+  const baseLikes = Number(post.likes || 0);
+  return post.id || !hasLiked(postLikeId(post)) ? baseLikes : baseLikes + 1;
+}
+
+function pickupReason(post) {
+  const reasons = {
+    稽古: "稽古場の判断が具体的に追える記録",
+    制作: "次の担当者がそのまま参照できる制作メモ",
+    告知: "直近の動きと参加導線がまとまった知らせ",
+  };
+  return reasons[post.category] || "活動の温度が短く読める記録";
+}
+
 function likeKey(id) {
   return `drama-like:${id}`;
 }
@@ -94,8 +113,8 @@ function setLiked(id, liked) {
 }
 
 function postCardHtml(post) {
-  const liked = hasLiked(post.id);
-  const disabled = !post.id ? "disabled" : "";
+  const likeId = postLikeId(post);
+  const liked = hasLiked(likeId);
   const label = liked ? "いいねを取り消す" : "いいね";
   const authorInitial = String(post.author || "演劇同好会").trim().charAt(0) || "演";
 
@@ -109,14 +128,17 @@ function postCardHtml(post) {
         </div>
         <h3>${escapeHtml(post.title)}</h3>
         <p>${escapeHtml(post.excerpt)}</p>
+        <span class="post-read-more">記事を読む</span>
       </a>
       <div class="card-footer">
         <span class="card-kicker">${escapeHtml(post.category)}</span>
         <span>稽古記録</span>
       </div>
-      <button class="like-button ${liked ? "is-liked" : ""}" type="button" data-like-id="${escapeHtml(post.id || "")}" aria-label="${label}" title="${label}" ${disabled}>
+      <button class="like-button ${liked ? "is-liked" : ""}" type="button" data-like-id="${escapeHtml(likeId)}" data-like-local="${
+        post.id ? "false" : "true"
+      }" aria-label="${label}" aria-pressed="${liked ? "true" : "false"}" title="${label}">
         <span class="heart-icon" aria-hidden="true">♥</span>
-        <strong data-like-count>${Number(post.likes || 0)}</strong>
+        <strong data-like-count>${postLikeCount(post)}</strong>
       </button>
     </article>
   `;
@@ -128,20 +150,37 @@ function renderPickup() {
     return;
   }
 
-  const picked = [...currentPosts].sort((a, b) => Number(b.likes || 0) - Number(a.likes || 0))[0];
+  const [picked, ...relatedPosts] = [...currentPosts].sort((a, b) => postLikeCount(b) - postLikeCount(a));
   pickupRoot.innerHTML = `
-    <a class="pickup-card reveal" href="${escapeHtml(postHref(picked))}">
-      <span class="label">pick up</span>
-      <div>
+    <div class="pickup-card archive-pickup-card reveal">
+      <a class="archive-pickup-main" href="${escapeHtml(postHref(picked))}">
+        <div class="pickup-label-row">
+          <span class="label">pick up</span>
+          <span class="pickup-like-note">♥ ${postLikeCount(picked)}</span>
+        </div>
+        <span class="pickup-reason">${escapeHtml(pickupReason(picked))}</span>
         <span class="card-kicker">${escapeHtml(picked.category)}</span>
         <h3>${escapeHtml(picked.title)}</h3>
         <p>${escapeHtml(picked.excerpt)}</p>
+        <div class="pickup-meta">
+          <span>${escapeHtml(picked.date)} / ${escapeHtml(picked.author)}</span>
+        </div>
+      </a>
+      <div class="pickup-side-list compact" aria-label="あわせて読みたい稽古記録">
+        ${relatedPosts
+          .slice(0, 2)
+          .map(
+            (post) => `
+              <a class="pickup-side-link" href="${escapeHtml(postHref(post))}">
+                <em>次に読む</em>
+                <span>${escapeHtml(post.category)} / ${escapeHtml(post.date)}</span>
+                <strong>${escapeHtml(post.title)}</strong>
+              </a>
+            `,
+          )
+          .join("")}
       </div>
-      <div class="pickup-meta">
-        <span>${escapeHtml(picked.date)} / ${escapeHtml(picked.author)}</span>
-        <strong>${Number(picked.likes || 0)} likes</strong>
-      </div>
-    </a>
+    </div>
   `;
 }
 
@@ -173,6 +212,12 @@ function renderPosts() {
 }
 
 function observeReveals() {
+  const targets = document.querySelectorAll(".reveal:not(.is-visible)");
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -185,15 +230,34 @@ function observeReveals() {
     { threshold: 0.15 }
   );
 
-  document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => observer.observe(el));
+  targets.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add("is-visible");
+      return;
+    }
+    observer.observe(el);
+  });
 }
 
 function updatePostLikes(id, likes) {
-  currentPosts = currentPosts.map((post) => (post.id === id ? { ...post, likes } : post));
+  currentPosts = currentPosts.map((post) => (postLikeId(post) === id ? { ...post, likes } : post));
 }
 
-async function likePost(id) {
+function likeFallbackPost(id) {
+  const nextLiked = !hasLiked(id);
+  setLiked(id, nextLiked);
+  renderPickup();
+  renderPosts();
+}
+
+async function likePost(id, isLocal = false) {
   if (!id) return;
+  if (isLocal) {
+    likeFallbackPost(id);
+    return;
+  }
+
   const nextLiked = !hasLiked(id);
 
   const response = await fetch("/api/like", {
@@ -237,16 +301,25 @@ paginationRoot.addEventListener("click", (event) => {
 
 postRoot.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-like-id]");
-  if (!button) return;
-  event.preventDefault();
-  event.stopPropagation();
+  if (button) {
+    event.preventDefault();
+    event.stopPropagation();
 
-  button.disabled = true;
-  try {
-    await likePost(button.dataset.likeId);
-  } catch (error) {
-    console.warn(error);
-    button.disabled = false;
+    button.disabled = true;
+    try {
+      await likePost(button.dataset.likeId, button.dataset.likeLocal === "true");
+    } catch (error) {
+      console.warn(error);
+      button.disabled = false;
+    }
+    return;
+  }
+
+  if (!event.target.closest("a")) {
+    const cardLink = event.target.closest(".post-card")?.querySelector(".post-card-link");
+    if (cardLink) {
+      window.location.href = cardLink.href;
+    }
   }
 });
 

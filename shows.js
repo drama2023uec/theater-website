@@ -1,5 +1,17 @@
 const fallbackShows = [
   {
+    id: "37eb1f2b-73b5-8116-9723-e5938914e068",
+    title: "電気通信大学演劇同好会 梅雨公演『潜る男』",
+    date: "7.1",
+    rawDate: "2026-07-01",
+    year: "2026",
+    status: "予約受付中",
+    venue: "調布市文化会館たづくり 11階 第1創作室",
+    body: "海の底で、ふたりは近づく。息を止めた先で、君を知る。電気通信大学演劇同好会の梅雨公演。新入生の活躍をご覧あれ。",
+    reservationUrl: "https://teket.jp/18495/70876",
+    href: "./show.html?id=37eb1f2b-73b5-8116-9723-e5938914e068",
+  },
+  {
     title: "夏季試演会「境界線の椅子」",
     date: "7.19",
     rawDate: "2026-07-19",
@@ -68,29 +80,52 @@ function isPastShow(show) {
   return !Number.isNaN(date.getTime()) && date < new Date();
 }
 
-function showRowHtml(show) {
+function showActionsHtml(show) {
+  const reservation = show.reservationUrl
+    ? `<a class="button primary" href="${escapeHtml(show.reservationUrl)}" target="_blank" rel="noopener">予約ページへ</a>`
+    : "";
   return `
-    <article class="show-row reveal">
+    <div class="show-row-actions">
+      ${reservation}
+      <a class="button secondary surface" href="${escapeHtml(showHref(show))}">PRページを見る</a>
+    </div>
+  `;
+}
+
+function showRowHtml(show, options = {}) {
+  const isFeatured = Boolean(options.featured);
+  return `
+    <article class="show-row ${isFeatured ? "show-row-featured" : ""} reveal">
       <a class="show-row-poster" href="${escapeHtml(showHref(show))}">
         ${flyerHtml(show)}
       </a>
       <div class="show-row-main">
         <div>
-          <span class="card-kicker">${escapeHtml(show.status)}</span>
+          <div class="show-row-status">
+            ${isFeatured ? '<span class="label">latest program</span>' : ""}
+            <span class="card-kicker">${escapeHtml(show.status)}</span>
+          </div>
           <h3><a href="${escapeHtml(showHref(show))}">${escapeHtml(show.title)}</a></h3>
           <p>${escapeHtml(show.body)}</p>
         </div>
         <div class="show-row-meta">
-          <span>${escapeHtml(show.date)} ${escapeHtml(show.year || "")}</span>
+          <span class="show-row-date">${escapeHtml(show.date)} ${escapeHtml(show.year || "")}</span>
           <span>${escapeHtml(show.venue)}</span>
-          <a class="text-link" href="${escapeHtml(showHref(show))}">PRページ</a>
+          ${isFeatured ? "" : `<a class="text-link" href="${escapeHtml(showHref(show))}">PRページ</a>`}
         </div>
+        ${isFeatured ? showActionsHtml(show) : ""}
       </div>
     </article>
   `;
 }
 
 function observeReveals() {
+  const targets = document.querySelectorAll(".reveal:not(.is-visible)");
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -103,16 +138,26 @@ function observeReveals() {
     { threshold: 0.15 }
   );
 
-  document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => observer.observe(el));
+  targets.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add("is-visible");
+      return;
+    }
+    observer.observe(el);
+  });
 }
 
 function renderShows() {
   const upcoming = currentShows.filter((show) => !isPastShow(show));
   const past = currentShows.filter(isPastShow);
+  const [featuredUpcoming, ...otherUpcoming] = upcoming;
 
   upcomingCount.textContent = `${upcoming.length}件`;
   pastCount.textContent = `${past.length}件`;
-  upcomingRoot.innerHTML = upcoming.length ? upcoming.map(showRowHtml).join("") : `<p class="empty-state">公開中の予定公演はまだない。</p>`;
+  upcomingRoot.innerHTML = upcoming.length
+    ? [showRowHtml(featuredUpcoming, { featured: true }), ...otherUpcoming.map((show) => showRowHtml(show))].join("")
+    : `<p class="empty-state">公開中の予定公演はまだない。</p>`;
   pastRoot.innerHTML = past.length ? past.map(showRowHtml).join("") : `<p class="empty-state">過去公演はまだ登録されていない。</p>`;
   observeReveals();
 }

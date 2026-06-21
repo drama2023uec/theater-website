@@ -12,6 +12,8 @@ fi
 git fetch origin "$branch" >/dev/null 2>&1 || true
 
 tracked_paths=(
+  "AGENTS.md"
+  "CLAUDE.md"
   ".gitignore"
   "README.md"
   "api"
@@ -28,6 +30,7 @@ tracked_paths=(
   "shows.js"
   "styles.css"
   "scripts"
+  "docs"
 )
 
 git add "${tracked_paths[@]}"

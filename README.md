@@ -42,6 +42,16 @@
 
 Notion APIキーはブラウザ側へ置かない。VercelやNetlifyの環境変数に保存し、サーバー側またはビルド時だけで読む。
 
+## ローカル確認
+
+本番と同じ進行度を確認する場合は、Vercel FunctionsとNotion環境変数を読む。
+
+```bash
+./scripts/dev-preview.sh
+```
+
+`python3 -m http.server` のような静的サーバーは `/api/content` を持たないため、ブラウザは `script.js` / `shows.js` のフォールバック公演を表示する。CSSや写真だけを軽く見る用途に限定する。
+
 ## Vercel環境変数
 
 VercelのProject Settings > Environment Variablesに以下を設定する。
@@ -67,6 +77,35 @@ Vercelへ直接デプロイするとGitHubには保存されない。変更を�
 ```
 
 このスクリプトはサイト本体だけをstageし、`.env*`, `.vercel/`, `.DS_Store`, `.claude/`, `outputs/`, `WORK_LOG_*.md` は保存対象から外す。
+開発ログの自動記録は無効である。保存処理はGitHubへのcommit/pushだけを行い、Obsidian Dailyへは書き込まない。
+
+## Roop運用
+
+開発を始める前に環境差分を確認する。
+
+```bash
+./scripts/ensure-agent-environment.sh
+./scripts/context-brief.sh
+./scripts/preflight.sh
+```
+
+1サイクル分の確認は以下を使う。進捗ログの自動記録は行わない。
+
+```bash
+./scripts/roop.sh "作業内容の要約"
+```
+
+無人roopは無効である。以下は起動しない。
+
+```bash
+./scripts/auto-roop.sh 3
+```
+
+止める場合:
+
+```bash
+touch work/roop/STOP
+```
 
 ## Notion側の必須操作
 

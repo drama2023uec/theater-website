@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>演劇同好会 | 公式サイト</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23141414'/%3E%3Cpath d='M16 42h32M20 22h24M24 22v20M40 22v20' stroke='%23f4efe6' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
     <meta
       name="description"
       content="演劇同好会は、脚本、演出、演技、照明、音響、美術まで学生がつくる団体です。"
@@ -11,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260622a" />
   </head>
   <body>
     <header class="site-header" data-header>
@@ -29,28 +30,54 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="./assets/theater-hero.png" alt="黒箱劇場で稽古をする学生たち" />
+        <img class="hero-image" src="./assets/rehearsal-ladder-stage.jpg" alt="舞台上で脚立を動かしながら仕込みを進める部員" />
         <div class="hero-vignette" aria-hidden="true"></div>
         <div class="hero-spotlight" aria-hidden="true"></div>
         <div class="hero-content">
           <p class="eyebrow">student theater collective</p>
-          <h1 id="hero-title">舞台は、受け継げる。</h1>
+          <h1 id="hero-title"><span>舞台は、</span><span>ここから</span><span>立ち上がる。</span></h1>
           <p class="hero-copy">
-            脚本から照明まで学生が担う演劇同好会。公演情報と稽古記録を、次の世代が迷わず更新できる形で残す。
+            脚本、演出、出演、照明、音響、美術まで学生が担う演劇同好会。公演の熱と稽古の記録を、次の部員へ渡せる形で残す。
           </p>
+          <div class="hero-facts" aria-label="活動の概要">
+            <span>年2回の本公演</span>
+            <span>脚本から小屋入りまで学生制作</span>
+            <span>Notionで更新</span>
+          </div>
           <div class="hero-actions" aria-label="主要アクション">
             <a class="button primary" href="./shows.html">公演を見る</a>
             <a class="button secondary" href="./journal.html">稽古記録を読む</a>
           </div>
         </div>
+        <aside class="hero-program-card" aria-label="最新公演">
+          <div class="hero-program-topline">
+            <span class="label">next program</span>
+            <span class="hero-program-status">予約受付中</span>
+          </div>
+          <h2>梅雨公演『潜る男』</h2>
+          <dl>
+            <div>
+              <dt>日程</dt>
+              <dd>2026.7.1</dd>
+            </div>
+            <div>
+              <dt>会場</dt>
+              <dd>たづくり 11階 第1創作室</dd>
+            </div>
+          </dl>
+          <div class="hero-program-actions">
+            <a class="button primary" href="https://teket.jp/18495/70876" target="_blank" rel="noopener">予約ページへ</a>
+            <a class="button secondary" href="./show.html?id=37eb1f2b-73b5-8116-9723-e5938914e068">PRを見る</a>
+          </div>
+        </aside>
       </section>
 
       <section class="intro-band" aria-label="最新情報">
         <div class="intro-grid">
           <article>
             <span class="label">next stage</span>
-            <h2>夏季試演会「境界線の椅子」</h2>
-            <p>7月19日、学生会館小ホール。予約不要、入退場自由。</p>
+            <h2>梅雨公演『潜る男』</h2>
+            <p>7月1日、調布市文化会館たづくり。入場無料、事前予約制。</p>
           </article>
           <article>
             <span class="label">update</span>
@@ -74,25 +101,41 @@
 
         <div class="about-layout">
           <div class="about-text">
-            <p>
-              年2回の本公演と、短編を試す試演会を軸に活動する。脚本会議から小屋入りまでを部員で分担し、舞台制作の全工程を経験する。
-            </p>
-            <p>
-              サイトは静的フロントエンドとCMSデータの分離を前提に設計する。見た目は自由に作り込み、日常更新はNotionの表入力へ寄せる。
-            </p>
+            <div class="about-note">
+              <span class="label">activity</span>
+              <p>
+                年2回の本公演と、短編を試す試演会を軸に活動する。脚本会議から小屋入りまでを部員で分担し、舞台制作の全工程を経験する。
+              </p>
+            </div>
+            <div class="about-note">
+              <span class="label">handoff</span>
+              <p>
+                後輩が更新するのは公演情報、稽古記録、予約リンクの3点。サイトの見た目はフロント側で固定し、日常更新はNotionの表入力へ寄せる。
+              </p>
+            </div>
           </div>
-          <div class="metrics" aria-label="活動概要">
-            <div>
-              <strong>2</strong>
-              <span>本公演 / 年</span>
-            </div>
-            <div>
-              <strong>4</strong>
-              <span>制作セクション</span>
-            </div>
-            <div>
-              <strong>0</strong>
-              <span>サーバー管理</span>
+          <div class="about-media">
+            <figure class="about-photo-frame about-photo-main">
+              <img src="./assets/stage-lights.jpg" alt="黒箱劇場の照明機材" />
+              <figcaption>照明、音響、美術を部員が分担して仕込む。</figcaption>
+            </figure>
+            <figure class="about-photo-frame about-photo-float">
+              <img src="./assets/classroom-stage.jpg" alt="教室を舞台にして上演する部員" />
+              <figcaption>教室や小ホールでも、短編を試して上演する。</figcaption>
+            </figure>
+            <div class="metrics" aria-label="活動概要">
+              <div>
+                <strong>2</strong>
+                <span>本公演 / 年</span>
+              </div>
+              <div>
+                <strong>4</strong>
+                <span>制作セクション</span>
+              </div>
+              <div>
+                <strong>0</strong>
+                <span>サーバー管理</span>
+              </div>
             </div>
           </div>
         </div>
@@ -158,20 +201,4 @@
       </section>
 
       <section class="section join" id="join">
-        <div class="join-copy">
-          <span class="label">join</span>
-          <h2>次の舞台を一緒につくる</h2>
-          <p>見学は毎週水曜と金曜。演技、照明、音響、衣装、広報、脚本のどこからでも参加できる。</p>
-        </div>
-        <a class="button primary dark" href="mailto:drama2023uec@gmail.com">見学を申し込む</a>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <span>演劇同好会</span>
-      <span>更新UI: Notion / 配信: 静的ホスティング想定</span>
-    </footer>
-
-    <script src="./script.js"></script>
-  </body>
-</html>
+        <div cla

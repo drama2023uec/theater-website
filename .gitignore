@@ -4,3 +4,6 @@
 .claude/
 outputs/
 WORK_LOG_*.md
+work/roop/
+!work/roop/.keep
+work/obsidian-pending/flushed/

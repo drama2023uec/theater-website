@@ -1,7 +1,21 @@
 const fallbackShows = [
   {
+    id: "37eb1f2b-73b5-8116-9723-e5938914e068",
+    title: "電気通信大学演劇同好会 梅雨公演『潜る男』",
+    date: "7.1",
+    rawDate: "2026-07-01",
+    year: "2026",
+    status: "予約受付中",
+    venue: "調布市文化会館たづくり 11階 第1創作室",
+    body: "海の底で、ふたりは近づく。息を止めた先で、君を知る。電気通信大学演劇同好会の梅雨公演。新入生の活躍をご覧あれ。",
+    reservationUrl: "https://teket.jp/18495/70876",
+    href: "./show.html?id=37eb1f2b-73b5-8116-9723-e5938914e068",
+  },
+  {
     title: "夏季試演会「境界線の椅子」",
     date: "7.19",
+    rawDate: "2026-07-19",
+    year: "2026",
     status: "予約不要",
     venue: "学生会館 小ホール",
     body: "短編3本を連続上演。入退場自由で、初見でも入りやすい試演会。",
@@ -9,6 +23,8 @@ const fallbackShows = [
   {
     title: "秋季本公演「夜明け前の稽古場」",
     date: "10.24",
+    rawDate: "2026-10-24",
+    year: "2026",
     status: "準備中",
     venue: "講堂ステージ",
     body: "脚本会議から立ち上げる新作。照明と音響のワークショップも同時進行。",
@@ -110,6 +126,7 @@ function renderShows() {
         </div>
         <h3>${escapeHtml(featured.title)}</h3>
         <p>${escapeHtml(featured.body)}</p>
+        <p class="program-action-note">入場導線は予約を主、PR確認を副に固定する。</p>
         <dl class="show-facts program-facts">
           <div>
             <dt>日程</dt>
@@ -172,6 +189,9 @@ function miniShowHtml(show) {
         </div>
         <h3><a href="${escapeHtml(showHref(show))}">${escapeHtml(show.title)}</a></h3>
         <p>${escapeHtml(show.venue)}</p>
+        <a class="mini-show-link" href="${escapeHtml(show.reservationUrl || showHref(show))}" ${show.reservationUrl ? 'target="_blank" rel="noopener"' : ""}>${
+          show.reservationUrl ? "予約" : "PR"
+        }</a>
       </div>
     </article>
   `;
@@ -183,6 +203,25 @@ function filteredPosts(category = currentFilter) {
 
 function postHref(post) {
   return post.href || (post.id ? `/article.html?id=${encodeURIComponent(post.id)}` : "#journal");
+}
+
+function postLikeId(post) {
+  if (post.id) return post.id;
+  return `fallback:${post.date}:${post.title}`;
+}
+
+function postLikeCount(post) {
+  const baseLikes = Number(post.likes || 0);
+  return post.id || !hasLiked(postLikeId(post)) ? baseLikes : baseLikes + 1;
+}
+
+function pickupReason(post) {
+  const reasons = {
+    稽古: "稽古場の判断が具体的に追える記録",
+    制作: "次の担当者がそのまま参照できる制作メモ",
+    告知: "直近の動きと参加導線がまとまった知らせ",
+  };
+  return reasons[post.category] || "活動の温度が短く読める記録";
 }
 
 function likeKey(id) {
@@ -203,8 +242,8 @@ function setLiked(id, liked) {
 }
 
 function postCardHtml(post) {
-  const liked = hasLiked(post.id);
-  const disabled = !post.id ? "disabled" : "";
+  const likeId = postLikeId(post);
+  const liked = hasLiked(likeId);
   const label = liked ? "いいねを取り消す" : "いいね";
   const authorInitial = String(post.author || "演劇同好会").trim().charAt(0) || "演";
 
@@ -218,14 +257,17 @@ function postCardHtml(post) {
         </div>
         <h3>${escapeHtml(post.title)}</h3>
         <p>${escapeHtml(post.excerpt)}</p>
+        <span class="post-read-more">記事を読む</span>
       </a>
       <div class="card-footer">
         <span class="card-kicker">${escapeHtml(post.category)}</span>
         <span>稽古記録</span>
       </div>
-      <button class="like-button ${liked ? "is-liked" : ""}" type="button" data-like-id="${escapeHtml(post.id || "")}" aria-label="${label}" title="${label}" ${disabled}>
+      <button class="like-button ${liked ? "is-liked" : ""}" type="button" data-like-id="${escapeHtml(likeId)}" data-like-local="${
+        post.id ? "false" : "true"
+      }" aria-label="${label}" aria-pressed="${liked ? "true" : "false"}" title="${label}">
         <span class="heart-icon" aria-hidden="true">♥</span>
-        <strong data-like-count>${Number(post.likes || 0)}</strong>
+        <strong data-like-count>${postLikeCount(post)}</strong>
       </button>
     </article>
   `;
@@ -248,11 +290,15 @@ function renderPickup() {
     return;
   }
 
-  const picked = [...currentPosts].sort((a, b) => Number(b.likes || 0) - Number(a.likes || 0))[0];
+  const [picked, ...relatedPosts] = [...currentPosts].sort((a, b) => postLikeCount(b) - postLikeCount(a));
   pickupRoot.innerHTML = `
-    <a class="pickup-card home-pickup-card reveal" href="${escapeHtml(postHref(picked))}">
-      <div class="home-pickup-copy">
-        <span class="label">pick up</span>
+    <div class="pickup-card home-pickup-card reveal">
+      <a class="home-pickup-copy" href="${escapeHtml(postHref(picked))}">
+        <div class="pickup-label-row">
+          <span class="label">pick up</span>
+          <span class="pickup-like-note">♥ ${postLikeCount(picked)}</span>
+        </div>
+        <span class="pickup-reason">${escapeHtml(pickupReason(picked))}</span>
         <div class="home-pickup-kickers">
           <span class="card-kicker">${escapeHtml(picked.category)}</span>
           <span>${escapeHtml(picked.author)} / ${escapeHtml(picked.date)}</span>
@@ -260,18 +306,33 @@ function renderPickup() {
         <h3>${escapeHtml(picked.title)}</h3>
         <p>${escapeHtml(picked.excerpt)}</p>
         <span class="text-link">記事を読む</span>
+      </a>
+      <div class="pickup-side-list" aria-label="あわせて読みたい稽古記録">
+        ${relatedPosts
+          .slice(0, 2)
+          .map(
+            (post) => `
+              <a class="pickup-side-link" href="${escapeHtml(postHref(post))}">
+                <em>次に読む</em>
+                <span>${escapeHtml(post.category)} / ${escapeHtml(post.date)}</span>
+                <strong>${escapeHtml(post.title)}</strong>
+              </a>
+            `,
+          )
+          .join("")}
       </div>
-      <div class="home-pickup-score" aria-label="${Number(picked.likes || 0)} likes">
-        <span>♥</span>
-        <strong>${Number(picked.likes || 0)}</strong>
-        <em>liked</em>
-      </div>
-    </a>
+    </div>
   `;
   observeReveals();
 }
 
 function observeReveals() {
+  const targets = document.querySelectorAll(".reveal:not(.is-visible)");
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -284,15 +345,34 @@ function observeReveals() {
     { threshold: 0.15 }
   );
 
-  document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) => observer.observe(el));
+  targets.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      el.classList.add("is-visible");
+      return;
+    }
+    observer.observe(el);
+  });
 }
 
 function updatePostLikes(id, likes) {
-  currentPosts = currentPosts.map((post) => (post.id === id ? { ...post, likes } : post));
+  currentPosts = currentPosts.map((post) => (postLikeId(post) === id ? { ...post, likes } : post));
 }
 
-async function likePost(id) {
+function likeFallbackPost(id) {
+  const nextLiked = !hasLiked(id);
+  setLiked(id, nextLiked);
+  renderPickup();
+  renderPosts(currentFilter);
+}
+
+async function likePost(id, isLocal = false) {
   if (!id) return;
+  if (isLocal) {
+    likeFallbackPost(id);
+    return;
+  }
+
   const nextLiked = !hasLiked(id);
 
   const response = await fetch("/api/like", {
@@ -312,6 +392,13 @@ async function likePost(id) {
   renderPosts(currentFilter);
 }
 
+function renderAllContent() {
+  renderShows();
+  renderPickup();
+  renderPosts(currentFilter);
+  observeReveals();
+}
+
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     filterButtons.forEach((item) => {
@@ -326,17 +413,26 @@ filterButtons.forEach((button) => {
 
 postRoot?.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-like-id]");
-  if (!button) return;
-  event.preventDefault();
-  event.stopPropagation();
+  if (button) {
+    event.preventDefault();
+    event.stopPropagation();
 
-  const id = button.dataset.likeId;
-  button.disabled = true;
-  try {
-    await likePost(id);
-  } catch (error) {
-    console.warn(error);
-    button.disabled = false;
+    const id = button.dataset.likeId;
+    button.disabled = true;
+    try {
+      await likePost(id, button.dataset.likeLocal === "true");
+    } catch (error) {
+      console.warn(error);
+      button.disabled = false;
+    }
+    return;
+  }
+
+  if (!event.target.closest("a")) {
+    const cardLink = event.target.closest(".post-card")?.querySelector(".post-card-link");
+    if (cardLink) {
+      window.location.href = cardLink.href;
+    }
   }
 });
 
@@ -350,6 +446,8 @@ function escapeHtml(value) {
 }
 
 async function loadContent() {
+  renderAllContent();
+
   try {
     const response = await fetch("/api/content", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`Content API returned ${response.status}`);
@@ -361,12 +459,10 @@ async function loadContent() {
     }
   } catch (error) {
     console.warn("Using fallback content.", error);
+    return;
   }
 
-  renderShows();
-  renderPickup();
-  renderPosts(currentFilter);
-  observeReveals();
+  renderAllContent();
 }
 
 window.addEventListener("scroll", () => {
@@ -375,8 +471,4 @@ window.addEventListener("scroll", () => {
 
 window.addEventListener("pointermove", (event) => {
   if (!spotlight) return;
-  spotlight.style.setProperty("--x", `${event.clientX}px`);
-  spotlight.style.setProperty("--y", `${event.clientY}px`);
-});
-
-loadContent();
+  spotlight.style.setProperty("--x", `${event.clie
