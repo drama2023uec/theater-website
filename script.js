@@ -471,4 +471,8 @@ window.addEventListener("scroll", () => {
 
 window.addEventListener("pointermove", (event) => {
   if (!spotlight) return;
-  spotlight.style.setProperty("--x", `${event.clie
+  spotlight.style.setProperty("--x", `${event.clientX}px`);
+  spotlight.style.setProperty("--y", `${event.clientY}px`);
+});
+
+loadContent();

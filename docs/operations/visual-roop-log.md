@@ -380,3 +380,91 @@ Visual Roop Score:
 合計: 20 / 20
 
 判定: 採用。次候補は公演PR詳細の細部検証。
+
+## 2026-06-22 公演PR詳細 After CTA Roop
+
+対象: 公演PR詳細ページの読後予約導線。
+
+実装:
+
+- 公演PR本文の下に読後CTA帯を追加し、本文を読んだあと予約ページへ戻れる構成にした。
+- 上部の予約CTAと読後CTAのURL、target、relを `show.js` で同期した。
+- API取得失敗時は読後CTAも問い合わせ導線へ倒し、空リンクにならないようにした。
+- 375pxではCTA帯を1カラム化し、長い公演名とボタンが横にはみ出さないよう調整した。
+- `show.html` のCSS/JSキャッシュバージョンを `20260622b` に更新した。
+
+検証:
+
+- `git diff --check` 通過。
+- `bash -n scripts/*.sh` 通過。
+- `node --check script.js journal.js shows.js show.js article.js api/content.js api/show.js api/post.js api/like.js` 通過。
+- `./scripts/preflight.sh` 通過。
+- Vercel dev preview `http://127.0.0.1:3000` で確認。
+- Headless Chrome CDPで公演PR詳細を 1440px / 768px / 375px で確認。
+- 横スクロールなし: 1440px `scrollWidth=1440`、768px `scrollWidth=768`、375px `scrollWidth=375`。
+- `.show-flyer` の実測比率は 1440px `0.70709`、768px `0.70707`、375px `0.70709`。
+- 上部予約CTAと読後CTAのhref一致。読後CTAボタンは全viewportで枠内に収まる。
+- 画像読み込み失敗なし。ページ側のコンソール例外なし。
+
+Visual Roop Score:
+
+| 項目 | 点 |
+| --- | ---: |
+| Heroの第一印象 | 2 |
+| 公演導線 | 2 |
+| A4チラシ | 2 |
+| ブログらしさ | 2 |
+| pickup | 2 |
+| 写真運用 | 2 |
+| CSS完成度 | 2 |
+| モバイル | 2 |
+| アクセシビリティ | 2 |
+| CMS整合性 | 2 |
+
+合計: 20 / 20
+
+判定: 採用。次候補は保存前の全体差分整理、または全ページ最終回帰確認。
+
+## 2026-06-22 Iteration 1106 全ページ回帰確認 / Favicon Roop
+
+対象: 主要ページの最終回帰確認と初回アクセス時の console error 除去。
+
+実装:
+
+- `index.html`、`shows.html`、`show.html`、`journal.html`、`article.html` に data URI favicon を追加した。
+- 外部ファイルを増やさず、ブラウザ既定の `/favicon.ico` 取得による 404 console error を消した。
+
+検証:
+
+- `git diff --check` 通過。
+- `bash -n scripts/*.sh` 通過。
+- `node --check script.js shows.js show.js journal.js article.js api/content.js api/show.js api/post.js api/like.js` 通過。
+- `./scripts/preflight.sh` 通過。
+- Vercel dev preview `http://127.0.0.1:3000` で確認。
+- `/api/content` はNotion連携済みで公演4件、記事16件を返却。
+- Headless Chromeで home / shows / show detail / journal / article detail を 1440px / 768px / 375px で確認。
+- 全対象でHTTP 400以上、ページconsole error、画像読み込み失敗なし。
+- 横スクロールなし: 全対象で `scrollWidth === clientWidth`。
+- `.show-flyer` の実測比率は `0.70707` から `0.70709` の範囲。
+- `show.html?id=37eb1f2b-73b5-8116-9723-e5938914e068` は予約CTA 2件を表示。
+- `article.html?id=37eb1f2b-73b5-811b-977c-ff2555adcb50` は本文11ブロック、関連記事2件を表示。
+- スクリーンショットは `work/iter1106-*-final.png` に保存。
+
+Visual Roop Score:
+
+| 項目 | 点 |
+| --- | ---: |
+| Heroの第一印象 | 2 |
+| 公演導線 | 2 |
+| A4チラシ | 2 |
+| ブログらしさ | 2 |
+| pickup | 2 |
+| 写真運用 | 2 |
+| CSS完成度 | 2 |
+| モバイル | 2 |
+| アクセシビリティ | 2 |
+| CMS整合性 | 2 |
+
+合計: 20 / 20
+
+判定: 採用。次候補は保存前の差分レビューとGitHub保存。

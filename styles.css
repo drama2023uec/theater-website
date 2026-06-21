@@ -2534,4 +2534,108 @@ h3 {
   .metrics div {
     min-height: 120px;
     border-left: 0;
-    
+    border-top: 1px solid var(--line);
+  }
+
+  .metrics div:first-child {
+    border-top: 0;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .article-shell {
+    width: calc(100% - 36px);
+    padding-top: 132px;
+  }
+
+  .article-detail h1 {
+    font-size: 30px;
+  }
+
+  .article-related-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .article-related-list {
+    grid-template-columns: 1fr;
+  }
+
+  .shows-archive h1,
+  .show-pr-main h1 {
+    font-size: 32px;
+  }
+
+  .show-pr {
+    padding: 24px;
+  }
+
+  .show-pr-after {
+    grid-template-columns: 1fr;
+  }
+
+  .show-pr-after .button {
+    width: 100%;
+  }
+
+  .program-feature-copy {
+    padding: 22px;
+  }
+
+  .program-poster-panel {
+    padding: 18px;
+  }
+
+  .program-date-badge {
+    top: 28px;
+    left: 28px;
+    min-width: 74px;
+  }
+
+  .program-date-badge strong {
+    font-size: 23px;
+  }
+
+  .program-actions {
+    display: grid;
+  }
+
+  .show-row-featured {
+    padding: 18px;
+    gap: 18px;
+  }
+
+  .show-row-featured .show-row-poster {
+    width: min(100%, 300px);
+    max-width: none;
+  }
+
+  .show-row-featured h3 {
+    font-size: 28px;
+  }
+
+  .show-row-actions {
+    display: grid;
+  }
+
+  .mini-show-card {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .show-ticket strong {
+    font-size: 48px;
+  }
+
+  .article-lead,
+  .article-body p,
+  .article-body li,
+  .show-pr-lead,
+  .show-pr-body p,
+  .show-pr-body li {
+    font-size: 16px;
+  }
+}

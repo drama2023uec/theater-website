@@ -141,4 +141,41 @@ function renderShow(show) {
     reservationEl.removeAttribute("rel");
     afterReservationEl.href = "mailto:drama2023uec@gmail.com";
     afterReservationEl.textContent = "問い合わせる";
-    afterReservationEl.removeAttribute("t
+    afterReservationEl.removeAttribute("target");
+    afterReservationEl.removeAttribute("rel");
+  }
+  blocksEl.innerHTML =
+    Array.isArray(show.blocks) && show.blocks.length > 0
+      ? blocksHtml(show.blocks)
+      : `
+        <h2>公演について</h2>
+        <p>${escapeHtml(show.body || "Notionの公演ページ本文を追加すると、ここにPR本文として反映される。")}</p>
+        <h2>来場案内</h2>
+        <p>会場、開演時刻、予約方法などはNotionの公演ページに追記して運用する。</p>
+      `;
+}
+
+async function loadShow() {
+  const id = new URLSearchParams(window.location.search).get("id");
+  if (!id) {
+    renderError("公演IDが指定されていない。公演一覧から開く必要がある。");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/show?id=${encodeURIComponent(id)}`, { cache: "no-store", headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`Show API returned ${response.status}`);
+    const show = await response.json();
+
+    renderShow(show);
+  } catch (error) {
+    console.warn(error);
+    if (fallbackShows[id]) {
+      renderShow(fallbackShows[id]);
+      return;
+    }
+    renderError("Notionの公演情報を取得できなかった。");
+  }
+}
+
+loadShow();
