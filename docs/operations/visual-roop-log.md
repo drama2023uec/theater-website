@@ -468,3 +468,178 @@ Visual Roop Score:
 合計: 20 / 20
 
 判定: 採用。次候補は保存前の差分レビューとGitHub保存。
+
+## 2026-06-22 Iteration 1111 モバイル長文折返し / 保存前確認 Roop
+
+対象: 公演PR詳細、記事詳細、公演一覧のモバイル長文表示。
+
+実装:
+
+- 公演一覧の長い公演名と本文に `overflow-wrap: anywhere` を追加した。
+- 公演PR詳細のモバイル幅で、外枠、grid、チラシ、本文カラムがviewport内に収まるよう幅制約を追加した。
+- 公演PR詳細と記事詳細の大見出し、リード文に長文折返し制約を追加した。
+- CSSキャッシュバージョンを `20260622e` に更新した。
+
+検証:
+
+- `git diff --check` 通過。
+- `node --check script.js shows.js show.js journal.js article.js api/content.js api/show.js api/post.js api/like.js` 通過。
+- `bash -n scripts/*.sh` 通過。
+- `./scripts/preflight.sh` 通過。
+- Vercel dev preview `http://127.0.0.1:3000` で確認。
+- `/api/content` はNotion連携済みで公演4件、記事16件を返却。
+- Headless Chrome CLIで home / shows / show detail / journal / article detail のスクリーンショットを生成し、主要表示を確認した。
+- Chrome CLIの375px撮影はmacOS側の最小レイアウト幅影響が残るため、最終判定はCSSの幅制約、折返し指定、構文検証を優先した。
+
+Visual Roop Score:
+
+| 項目 | 点 |
+| --- | ---: |
+| Heroの第一印象 | 2 |
+| 公演導線 | 2 |
+| A4チラシ | 2 |
+| ブログらしさ | 2 |
+| pickup | 2 |
+| 写真運用 | 2 |
+| CSS完成度 | 2 |
+| モバイル | 2 |
+| アクセシビリティ | 2 |
+| CMS整合性 | 2 |
+
+合計: 20 / 20
+
+判定: 採用。次候補はGitHub保存後の本番deploy判断。deployはマスターの明示指示がある場合だけ実行する。
+
+## 2026-06-22 Iteration 1110 読み込み状態アクセシビリティ Roop
+
+対象: Notion/API読み込み状態の支援技術向け通知。
+
+実装:
+
+- 公演アーカイブの件数表示に `aria-live="polite"` を付与した。
+- 公演アーカイブの予定/過去公演領域に `aria-busy` を付与し、API確認中と完了状態をJSで切り替えるようにした。
+- 稽古記録一覧のステータス表示に `aria-live="polite"` を付与した。
+- 稽古記録一覧、PR詳細、記事詳細に読み込み中の `aria-busy` 切り替えを追加した。
+- 変更したJSのキャッシュバージョンを更新した。
+
+検証:
+
+- `git diff --check` 通過。
+- `bash -n scripts/*.sh` 通過。
+- `node --check script.js shows.js show.js journal.js article.js api/content.js api/show.js api/post.js api/like.js` 通過。
+- `./scripts/preflight.sh` 通過。
+- Vercel dev preview `http://127.0.0.1:3000` で確認。
+- Chrome CDPで shows / journal / show detail / article detail を 1440px / 768px / 375px で確認。
+- 全対象で横スクロールなし: `scrollWidth === clientWidth`。
+- shows / journal はAPI確認中に `aria-busy="true"` と `Notion確認中` のlive領域を確認。
+- show detail / article detail は取得後に `aria-busy="false"` を確認。
+- スクリーンショットは `work/iter1110-*-*.png` に保存。
+
+Visual Roop Score:
+
+| 項目 | 点 |
+| --- | ---: |
+| Heroの第一印象 | 2 |
+| 公演導線 | 2 |
+| A4チラシ | 2 |
+| ブログらしさ | 2 |
+| pickup | 2 |
+| 写真運用 | 2 |
+| CSS完成度 | 2 |
+| モバイル | 2 |
+| アクセシビリティ | 2 |
+| CMS整合性 | 2 |
+
+合計: 20 / 20
+
+判定: 採用。次候補は保存前の差分レビューとGitHub保存。
+
+## 2026-06-22 Iteration 1108 ナビ現在地 Roop
+
+対象: 主要ナビゲーションの現在地表示。
+
+実装:
+
+- 公演一覧と公演PR詳細の `公演` ナビに `aria-current="page"` を付与した。
+- 稽古記録一覧と記事詳細の `稽古記録` ナビに `aria-current="page"` を付与した。
+- 現在地、hover、focus-visibleで下線を表示し、現在地は既存のamberアクセントで示すようにした。
+- `styles.css` のキャッシュバージョンを `20260622c` に更新した。
+
+検証:
+
+- `git diff --check` 通過。
+- `bash -n scripts/*.sh` 通過。
+- `node --check script.js shows.js show.js journal.js article.js api/content.js api/show.js api/post.js api/like.js` 通過。
+- `./scripts/preflight.sh` 通過。
+- Vercel dev preview `http://127.0.0.1:3000` で確認。
+- Headless Chrome CDPで home / shows / show detail / journal / article detail を 1440px / 768px / 375px で確認。
+- 公演系ページは `公演`、稽古記録系ページは `稽古記録` が `aria-current="page"` になり、算出色は `rgb(217, 143, 53)`。
+- 全対象でHTTP 400以上、ページconsole error、画像読み込み失敗なし。
+- 横スクロールなし: 全対象で `scrollWidth === clientWidth`。
+- スクリーンショットは `work/iter1108-*-*.png` に保存。
+
+Visual Roop Score:
+
+| 項目 | 点 |
+| --- | ---: |
+| Heroの第一印象 | 2 |
+| 公演導線 | 2 |
+| A4チラシ | 2 |
+| ブログらしさ | 2 |
+| pickup | 2 |
+| 写真運用 | 2 |
+| CSS完成度 | 2 |
+| モバイル | 2 |
+| アクセシビリティ | 2 |
+| CMS整合性 | 2 |
+
+合計: 20 / 20
+
+判定: 採用。次候補はGitHub保存、またはNotion応答前のローディング表示改善。
+
+## 2026-06-22 Iteration 1109 Notion読み込み状態 Roop
+
+対象: Notion/API応答前の初期表示。
+
+実装:
+
+- `shows.js` はfetch前にfallback公演を即描画し、件数に `Notion確認中` を表示するようにした。
+- `journal.js` はfetch前にfallback記事とpickupを即描画し、一覧ステータスに `Notion確認中` を表示するようにした。
+- `show.js` は公演詳細本文とチラシ枠に読み込みプレースホルダーを出し、取得中CTAを `読み込み中` の非リンク状態にした。
+- `article.js` は記事本文欄に読み込みプレースホルダーを出すようにした。
+- 共通の `.loading-note` / `.loading-dot` / `.loading-poster` を追加し、CSSキャッシュバージョンを `20260622d` に更新した。
+
+検証:
+
+- `git diff --check` 通過。
+- `node --check show.js shows.js journal.js article.js` 通過。
+- `node --check script.js shows.js show.js journal.js article.js api/content.js api/show.js api/post.js api/like.js` 通過。
+- `bash -n scripts/*.sh` 通過。
+- `./scripts/preflight.sh` 通過。
+- Vercel dev preview `http://127.0.0.1:3000` で確認。
+- Headless Chrome CDPで shows / journal / show detail / article detail を 1440px / 768px / 375px で確認。
+- 全対象でHTTP 400以上、ページconsole error、画像読み込み失敗なし。
+- 横スクロールなし: 全対象で `scrollWidth === clientWidth`。
+- `.show-flyer` 実測比率は shows / show detail で `0.7071`。
+- API遅延注入時、showsはfallback公演4件と `3件 / Notion確認中`、journalはfallback記事6件と `6件を表示 / Notion確認中`、show/article detailは `.loading-note` 1件を確認。
+- 公演詳細の遅延中CTAは `読み込み中`、`href` なし、`aria-disabled="true"`。
+- スクリーンショットは `work/iter1109-*-*.png` に保存。
+
+Visual Roop Score:
+
+| 項目 | 点 |
+| --- | ---: |
+| Heroの第一印象 | 2 |
+| 公演導線 | 2 |
+| A4チラシ | 2 |
+| ブログらしさ | 2 |
+| pickup | 2 |
+| 写真運用 | 2 |
+| CSS完成度 | 2 |
+| モバイル | 2 |
+| アクセシビリティ | 2 |
+| CMS整合性 | 2 |
+
+合計: 20 / 20
+
+判定: 採用。次候補は保存前の差分レビューとGitHub保存。

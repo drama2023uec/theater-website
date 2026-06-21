@@ -12,6 +12,7 @@ const afterStatusEl = document.querySelector("[data-show-after-status]");
 const afterTitleEl = document.querySelector("[data-show-after-title]");
 const afterCopyEl = document.querySelector("[data-show-after-copy]");
 const afterReservationEl = document.querySelector("[data-show-after-reservation]");
+const showRegion = document.querySelector("[data-show]");
 
 const fallbackShows = {
   "37eb1f2b-73b5-8116-9723-e5938914e068": {
@@ -76,6 +77,7 @@ function blocksHtml(blocks) {
 }
 
 function renderError(message) {
+  showRegion?.setAttribute("aria-busy", "false");
   titleEl.textContent = "公演情報を表示できません";
   statusEl.textContent = "";
   ticketStatusEl.textContent = "";
@@ -113,6 +115,7 @@ function flyerHtml(show) {
 }
 
 function renderShow(show) {
+  showRegion?.setAttribute("aria-busy", "false");
   document.title = `${show.title} | 演劇同好会`;
   titleEl.textContent = show.title;
   statusEl.textContent = show.status;
@@ -130,19 +133,23 @@ function renderShow(show) {
     reservationEl.textContent = "予約ページへ";
     reservationEl.target = "_blank";
     reservationEl.rel = "noopener";
+    reservationEl.removeAttribute("aria-disabled");
     afterReservationEl.href = show.reservationUrl;
     afterReservationEl.textContent = "予約ページへ";
     afterReservationEl.target = "_blank";
     afterReservationEl.rel = "noopener";
+    afterReservationEl.removeAttribute("aria-disabled");
   } else {
     reservationEl.href = "mailto:drama2023uec@gmail.com";
     reservationEl.textContent = "問い合わせる";
     reservationEl.removeAttribute("target");
     reservationEl.removeAttribute("rel");
+    reservationEl.removeAttribute("aria-disabled");
     afterReservationEl.href = "mailto:drama2023uec@gmail.com";
     afterReservationEl.textContent = "問い合わせる";
     afterReservationEl.removeAttribute("target");
     afterReservationEl.removeAttribute("rel");
+    afterReservationEl.removeAttribute("aria-disabled");
   }
   blocksEl.innerHTML =
     Array.isArray(show.blocks) && show.blocks.length > 0
@@ -155,12 +162,41 @@ function renderShow(show) {
       `;
 }
 
+function renderLoading() {
+  showRegion?.setAttribute("aria-busy", "true");
+  reservationEl.removeAttribute("href");
+  reservationEl.removeAttribute("target");
+  reservationEl.removeAttribute("rel");
+  reservationEl.setAttribute("aria-disabled", "true");
+  reservationEl.textContent = "読み込み中";
+  afterReservationEl.removeAttribute("href");
+  afterReservationEl.removeAttribute("target");
+  afterReservationEl.removeAttribute("rel");
+  afterReservationEl.setAttribute("aria-disabled", "true");
+  afterReservationEl.textContent = "読み込み中";
+  flyerEl.innerHTML = `
+    <div class="show-flyer poster-fallback is-large loading-poster" aria-label="公演チラシを読み込み中">
+      <span>loading</span>
+      <strong>公演情報を確認中</strong>
+      <em>Notion API</em>
+    </div>
+  `;
+  blocksEl.innerHTML = `
+    <div class="loading-note" role="status" aria-live="polite">
+      <span class="loading-dot" aria-hidden="true"></span>
+      <strong>Notionの公演本文を確認中</strong>
+      <p>取得できない場合は、このページ内のfallback情報に切り替える。</p>
+    </div>
+  `;
+}
+
 async function loadShow() {
   const id = new URLSearchParams(window.location.search).get("id");
   if (!id) {
     renderError("公演IDが指定されていない。公演一覧から開く必要がある。");
     return;
   }
+  renderLoading();
 
   try {
     const response = await fetch(`/api/show?id=${encodeURIComponent(id)}`, { cache: "no-store", headers: { Accept: "application/json" } });

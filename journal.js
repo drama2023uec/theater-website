@@ -54,6 +54,7 @@ const postRoot = document.querySelector("[data-journal-posts]");
 const pickupRoot = document.querySelector("[data-pickup]");
 const paginationRoot = document.querySelector("[data-pagination]");
 const statusRoot = document.querySelector("[data-journal-status]");
+const journalRegion = document.querySelector("[data-journal-region]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 let currentPosts = fallbackPosts;
 let currentFilter = "all";
@@ -324,6 +325,11 @@ postRoot.addEventListener("click", async (event) => {
 });
 
 async function loadContent() {
+  journalRegion?.setAttribute("aria-busy", "true");
+  renderPickup();
+  renderPosts();
+  statusRoot.textContent = `${currentPosts.length}件を表示 / Notion確認中`;
+
   try {
     const response = await fetch("/api/content", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`Content API returned ${response.status}`);
@@ -337,6 +343,7 @@ async function loadContent() {
 
   renderPickup();
   renderPosts();
+  journalRegion?.setAttribute("aria-busy", "false");
 }
 
 loadContent();

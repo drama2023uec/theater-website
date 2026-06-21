@@ -44,6 +44,7 @@ const upcomingRoot = document.querySelector("[data-upcoming-shows]");
 const pastRoot = document.querySelector("[data-past-shows]");
 const upcomingCount = document.querySelector("[data-upcoming-count]");
 const pastCount = document.querySelector("[data-past-count]");
+const showsRegions = document.querySelectorAll("[data-shows-region]");
 let currentShows = fallbackShows;
 
 function escapeHtml(value) {
@@ -163,6 +164,11 @@ function renderShows() {
 }
 
 async function loadContent() {
+  showsRegions.forEach((region) => region.setAttribute("aria-busy", "true"));
+  renderShows();
+  upcomingCount.textContent = `${currentShows.filter((show) => !isPastShow(show)).length}件 / Notion確認中`;
+  pastCount.textContent = `${currentShows.filter(isPastShow).length}件 / Notion確認中`;
+
   try {
     const response = await fetch("/api/content", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`Content API returned ${response.status}`);
@@ -175,6 +181,7 @@ async function loadContent() {
   }
 
   renderShows();
+  showsRegions.forEach((region) => region.setAttribute("aria-busy", "false"));
 }
 
 loadContent();

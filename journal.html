@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=20260622a" />
+    <link rel="stylesheet" href="./styles.css?v=20260622e" />
   </head>
   <body class="archive-page">
     <header class="site-header is-solid" data-header>
@@ -20,7 +20,7 @@
       <nav class="nav" aria-label="主要ナビゲーション">
         <a href="./index.html#about">紹介</a>
         <a href="./shows.html">公演</a>
-        <a href="./journal.html">稽古記録</a>
+        <a href="./journal.html" aria-current="page">稽古記録</a>
         <a href="./index.html#join">参加</a>
       </nav>
     </header>
@@ -42,8 +42,8 @@
         </div>
 
         <div class="archive-layout">
-          <div class="archive-feed">
-            <p class="archive-status" data-journal-status>読み込み中</p>
+          <div class="archive-feed" data-journal-region>
+            <p class="archive-status" data-journal-status aria-live="polite">読み込み中</p>
             <div class="post-grid" data-journal-posts></div>
             <nav class="pagination" data-pagination aria-label="稽古記録ページ"></nav>
           </div>
@@ -59,6 +59,6 @@
       <a href="./index.html#top">トップへ戻る</a>
     </footer>
 
-    <script src="./journal.js?v=20260621i"></script>
+    <script src="./journal.js?v=20260622b"></script>
   </body>
 </html>

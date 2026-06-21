@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=20260622a" />
+    <link rel="stylesheet" href="./styles.css?v=20260622e" />
   </head>
   <body class="shows-page">
     <header class="site-header is-solid" data-header>
@@ -19,7 +19,7 @@
       </a>
       <nav class="nav" aria-label="主要ナビゲーション">
         <a href="./index.html#about">紹介</a>
-        <a href="./shows.html">公演</a>
+        <a href="./shows.html" aria-current="page">公演</a>
         <a href="./journal.html">稽古記録</a>
         <a href="./index.html#join">参加</a>
       </nav>
@@ -33,18 +33,18 @@
           <p>公演ごとのPRページと、終了した公演の記録をまとめる。</p>
         </div>
 
-        <section class="show-archive-block" aria-labelledby="upcoming-title">
+        <section class="show-archive-block" aria-labelledby="upcoming-title" data-shows-region>
           <div class="archive-section-title">
             <h2 id="upcoming-title">これからの公演</h2>
-            <span data-upcoming-count>0件</span>
+            <span data-upcoming-count aria-live="polite">0件</span>
           </div>
           <div class="show-list" data-upcoming-shows></div>
         </section>
 
-        <section class="show-archive-block" aria-labelledby="past-title">
+        <section class="show-archive-block" aria-labelledby="past-title" data-shows-region>
           <div class="archive-section-title">
             <h2 id="past-title">過去公演</h2>
-            <span data-past-count>0件</span>
+            <span data-past-count aria-live="polite">0件</span>
           </div>
           <div class="show-list" data-past-shows></div>
         </section>
@@ -56,6 +56,6 @@
       <a href="./index.html#top">トップへ戻る</a>
     </footer>
 
-    <script src="./shows.js?v=20260621f"></script>
+    <script src="./shows.js?v=20260622b"></script>
   </body>
 </html>

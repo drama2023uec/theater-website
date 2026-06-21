@@ -8,6 +8,7 @@ const likeButton = document.querySelector("[data-article-like]");
 const likeCountEl = document.querySelector("[data-article-likes]");
 const relatedSection = document.querySelector("[data-article-related]");
 const relatedListEl = document.querySelector("[data-article-related-list]");
+const articleRegion = document.querySelector("[data-article]");
 let currentPostId = "";
 
 function escapeHtml(value) {
@@ -54,6 +55,7 @@ function blocksHtml(blocks) {
 }
 
 function renderError(message) {
+  articleRegion?.setAttribute("aria-busy", "false");
   titleEl.textContent = "稽古記録を表示できません";
   dateEl.textContent = "";
   authorEl.textContent = "";
@@ -168,6 +170,14 @@ async function loadArticle() {
     return;
   }
   currentPostId = id;
+  articleRegion?.setAttribute("aria-busy", "true");
+  bodyEl.innerHTML = `
+    <div class="loading-note" role="status" aria-live="polite">
+      <span class="loading-dot" aria-hidden="true"></span>
+      <strong>Notionの記事本文を確認中</strong>
+      <p>本文、いいね数、関連記事を順に取得する。</p>
+    </div>
+  `;
 
   try {
     const response = await fetch(`/api/post?id=${encodeURIComponent(id)}`, { cache: "no-store", headers: { Accept: "application/json" } });
@@ -181,6 +191,7 @@ async function loadArticle() {
     authorEl.textContent = post.author;
     excerptEl.textContent = post.excerpt;
     renderLikeButton({ ...post, id });
+    articleRegion?.setAttribute("aria-busy", "false");
     bodyEl.innerHTML =
       Array.isArray(post.blocks) && post.blocks.length > 0
         ? blocksHtml(post.blocks)
