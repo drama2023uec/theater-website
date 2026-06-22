@@ -290,13 +290,13 @@ function renderPickup() {
     return;
   }
 
-  const [picked, ...relatedPosts] = [...currentPosts].sort((a, b) => postLikeCount(b) - postLikeCount(a));
+  const [picked, ...relatedPosts] = currentPosts;
   pickupRoot.innerHTML = `
     <div class="pickup-card home-pickup-card reveal">
       <a class="home-pickup-copy" href="${escapeHtml(postHref(picked))}">
         <div class="pickup-label-row">
           <span class="label">pick up</span>
-          <span class="pickup-like-note">♥ ${postLikeCount(picked)}</span>
+          <span class="pickup-like-note">編集部推薦</span>
         </div>
         <span class="pickup-reason">${escapeHtml(pickupReason(picked))}</span>
         <div class="home-pickup-kickers">
@@ -308,12 +308,16 @@ function renderPickup() {
         <span class="text-link">記事を読む</span>
       </a>
       <div class="pickup-side-list" aria-label="あわせて読みたい稽古記録">
+        <div class="pickup-side-heading">
+          <span>related</span>
+          <strong>次に読む2本</strong>
+        </div>
         ${relatedPosts
           .slice(0, 2)
           .map(
             (post) => `
               <a class="pickup-side-link" href="${escapeHtml(postHref(post))}">
-                <em>次に読む</em>
+                <em>あわせて読む</em>
                 <span>${escapeHtml(post.category)} / ${escapeHtml(post.date)}</span>
                 <strong>${escapeHtml(post.title)}</strong>
               </a>
