@@ -28,6 +28,7 @@ ensure_codex_trusted_project() {
 }
 
 ensure_codex_trusted_project "$repo_parent"
-echo "dev log disabled: Obsidian Daily write checks skipped"
-echo "dev log disabled: git hooksPath setup skipped"
+echo "dev log direct write disabled: Obsidian Daily write checks skipped"
+echo "dev log direct write disabled: git hooksPath setup skipped"
+echo "dev log external automation allowed: /Users/owner/obsidian-automation may summarize committed changes"
 ./scripts/preflight.sh

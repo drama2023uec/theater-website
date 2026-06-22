@@ -18,4 +18,4 @@ echo "## Operation Docs"
 printf '%s\n' "- docs/operations/roop-delegation.md"
 printf '%s\n' "- README.md"
 echo
-echo "Dev log and Obsidian context loading are disabled."
+echo "Direct Obsidian writes are disabled; external devlog automation may summarize committed changes."

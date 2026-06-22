@@ -77,7 +77,7 @@ Vercelへ直接デプロイするとGitHubには保存されない。変更を�
 ```
 
 このスクリプトはサイト本体だけをstageし、`.env*`, `.vercel/`, `.DS_Store`, `.claude/`, `outputs/`, `WORK_LOG_*.md` は保存対象から外す。
-開発ログの自動記録は無効である。保存処理はGitHubへのcommit/pushだけを行い、Obsidian Dailyへは書き込まない。
+このrepoからObsidianへ開発ログを直接書き込まない。保存処理はGitHubへのcommit/pushだけを行う。外部 `/Users/owner/obsidian-automation` がcommit済み変更を読み取り、Obsidianへ要約を記録することは許可する。
 
 ## Roop運用
 

@@ -1,6 +1,6 @@
 # Roop設計と権限委譲
 
-このサイトの開発は、GitHubを永続保存、Vercelを本番反映、NotionをCMSとして扱う。開発ログの自動記録と無人roopは無効である。
+このサイトの開発は、GitHubを永続保存、Vercelを本番反映、NotionをCMSとして扱う。repo内への開発ログ保存、作業中のVault直接編集、無人roopは無効である。外部 `/Users/owner/obsidian-automation` がcommit済み変更を読み取り、Obsidianへ要約を記録することは許可する。
 
 ## 原則
 
@@ -9,7 +9,8 @@
 - ローカル確認は `./scripts/dev-preview.sh` を使う。
 - 保存は `./scripts/save-to-github.sh "message"` を使う。
 - 本番反映は `./scripts/deploy-prod.sh "message"` だけを使う。
-- 開発ログの自動記録は使わない。
+- このrepoからObsidianへ開発ログを直接書かない。
+- post-commit hookや `core.hooksPath` は使わない。
 - 静的サーバーはAPIなし確認用であり、進行度確認には使わない。
 - 環境健全性は `./scripts/preflight.sh` で確認する。
 - roop/auto-roopは使わない。
@@ -37,7 +38,7 @@
    - `bash -n scripts/*.sh`
    - ChromeまたはVercel devで主要画面を確認する。
 5. Record
-   - 開発ログは自動記録しない。
+   - このrepoから開発ログを直接記録しない。
 6. Sync
    - 保存する場合は `./scripts/save-to-github.sh "message"`。
    - deployする場合は `./scripts/deploy-prod.sh "message"`。
@@ -84,7 +85,7 @@
 
 ## 現在の制限
 
-開発ログの自動記録と無人roopは無効。必要な場合だけマスターが明示的に再設計を指示する。
+このrepoからの開発ログ直接記録と無人roopは無効。外部 `/Users/owner/obsidian-automation` によるcommit済み変更の要約記録は許可する。
 
 ## 実行コマンド
 
