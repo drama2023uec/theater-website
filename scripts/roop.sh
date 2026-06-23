@@ -27,7 +27,7 @@ bash -n scripts/deploy-prod.sh
 bash -n scripts/preflight.sh
 bash -n scripts/roop.sh
 
-for file in script.js shows.js show.js journal.js article.js api/content.js api/show.js api/post.js api/like.js tests/notion-source.test.js tests/about-slideshow.test.js tests/notion-images.test.js; do
+for file in script.js shows.js show.js journal.js article.js api/content.js api/show.js api/post.js api/like.js tests/notion-source.test.js tests/about-slideshow.test.js tests/notion-images.test.js tests/responsive-viewport.test.js; do
   node --check "$file"
 done
 
