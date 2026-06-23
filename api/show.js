@@ -47,6 +47,24 @@ function propertyUrl(properties, names) {
   return "";
 }
 
+function firstPropertyText(properties, names) {
+  for (const name of names) {
+    const value = propertyText(properties, name);
+    if (value) return value;
+  }
+  return "";
+}
+
+function propertyList(properties, names) {
+  const value = firstPropertyText(properties, names);
+  return value
+    ? value
+        .split(/\n|、|,/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+}
+
 function formatShowDate(value) {
   if (!value) return { date: "未定", year: "" };
   const date = new Date(value);
@@ -104,18 +122,36 @@ module.exports = async function handler(request, response) {
       fetchNotion(`/blocks/${encodeURIComponent(id)}/children?page_size=100`),
     ]);
     const properties = page.properties || {};
+    const title = propertyText(properties, "Name") || "無題";
     const formattedDate = formatShowDate(propertyText(properties, "Date"));
     const blocks = (children.results || []).map(mapBlock).filter(Boolean).filter((block) => block.text);
 
     response.setHeader("Cache-Control", "no-store");
     response.status(200).json({
       id,
-      title: propertyText(properties, "Name") || "無題",
+      title,
+      shortTitle: firstPropertyText(properties, ["ShortTitle", "Short Title", "略称"]),
       date: propertyText(properties, "DisplayDate") || formattedDate.date,
+      displayDate: propertyText(properties, "DisplayDate"),
       rawDate: propertyText(properties, "Date"),
       year: propertyText(properties, "Year") || formattedDate.year,
       status: propertyText(properties, "Status") || "公開中",
       venue: propertyText(properties, "Venue") || "会場未定",
+      venueAddress: firstPropertyText(properties, ["VenueAddress", "Venue Address", "住所"]),
+      access: firstPropertyText(properties, ["Access", "アクセス"]),
+      openTime: firstPropertyText(properties, ["OpenTime", "Open Time", "開場"]),
+      startTime: firstPropertyText(properties, ["StartTime", "Start Time", "開演"]),
+      runtime: firstPropertyText(properties, ["Runtime", "上演時間"]),
+      price: firstPropertyText(properties, ["Price", "料金"]),
+      ticketType: firstPropertyText(properties, ["TicketType", "Ticket Type", "席種"]),
+      reservationNote: firstPropertyText(properties, ["ReservationNote", "Reservation Note", "予約条件"]),
+      playwright: firstPropertyText(properties, ["Playwright", "作", "作者"]),
+      sourceLabel: firstPropertyText(properties, ["SourceLabel", "Source Label", "出典名"]),
+      sourceUrl: propertyUrl(properties, ["SourceUrl", "Source URL", "出典URL"]),
+      cast: propertyList(properties, ["Cast", "出演"]),
+      staff: propertyList(properties, ["Staff", "スタッフ"]),
+      notes: propertyList(properties, ["Notes", "注意事項"]),
+      contact: firstPropertyText(properties, ["Contact", "問い合わせ"]),
       body: propertyText(properties, "Description") || "",
       flyerUrl: propertyFileUrl(properties, ["Flyer", "FlyerUrl", "Flyer URL", "Flyer Image", "チラシ"]),
       reservationUrl: propertyUrl(properties, ["ReservationUrl", "Reservation URL", "TicketUrl", "Ticket URL", "予約URL"]),

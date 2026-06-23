@@ -15,6 +15,7 @@ tracked_paths=(
   "AGENTS.md"
   "CLAUDE.md"
   ".gitignore"
+  "CLUB_CONTEXT.md"
   "README.md"
   "api"
   "article.html"
@@ -31,6 +32,7 @@ tracked_paths=(
   "styles.css"
   "scripts"
   "docs"
+  "tests"
 )
 
 git add "${tracked_paths[@]}"

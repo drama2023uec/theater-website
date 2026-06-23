@@ -24,8 +24,11 @@ check "NOTION_SHOWS_DATABASE_ID exists in .env.local" grep -q '^NOTION_SHOWS_DAT
 check "context-brief is executable" test -x scripts/context-brief.sh
 check "dev-preview is executable" test -x scripts/dev-preview.sh
 check "ensure-agent-environment is executable" test -x scripts/ensure-agent-environment.sh
-check "homepage fallback includes 潜る男" grep -q '潜る男' script.js
-check "shows fallback includes 潜る男" grep -q '潜る男' shows.js
-check "show detail fallback includes 潜る男" grep -q '潜る男' show.js
+check "no local show data file" test ! -f site-data.js
+check "no local content helper file" test ! -f site-content.js
+check "homepage does not load local JSON data" bash -c '! grep -q "site-data.js\\|site-content.js" index.html'
+check "shows page does not load local JSON data" bash -c '! grep -q "site-data.js\\|site-content.js" shows.html'
+check "journal page does not load local JSON data" bash -c '! grep -q "site-data.js\\|site-content.js" journal.html'
+check "API content reads Notion only" bash -c '! grep -q "require(.*site-data" api/content.js'
 
 exit "$fail"

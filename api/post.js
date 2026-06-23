@@ -27,6 +27,21 @@ function propertyNumber(properties, name) {
   return prop?.type === "number" && Number.isFinite(prop.number) ? prop.number : 0;
 }
 
+function propertyFileUrl(properties, names) {
+  for (const name of names) {
+    const prop = properties[name];
+    if (!prop) continue;
+    if (prop.type === "files") {
+      const file = prop.files?.[0];
+      if (file?.type === "external") return file.external?.url || "";
+      if (file?.type === "file") return file.file?.url || "";
+    }
+    if (prop.type === "url") return prop.url || "";
+    if (prop.type === "rich_text") return plainText(prop.rich_text);
+  }
+  return "";
+}
+
 function formatPostDate(value) {
   if (!value) return "日付未定";
   const date = new Date(value);
@@ -36,6 +51,15 @@ function formatPostDate(value) {
 
 function mapBlock(block) {
   const data = block[block.type] || {};
+
+  if (block.type === "image") {
+    const url = data.type === "external" ? data.external?.url || "" : data.file?.url || "";
+    return {
+      type: block.type,
+      url,
+      caption: plainText(data.caption),
+    };
+  }
 
   if (["paragraph", "heading_1", "heading_2", "heading_3", "quote", "bulleted_list_item", "numbered_list_item"].includes(block.type)) {
     return {
@@ -81,16 +105,18 @@ module.exports = async function handler(request, response) {
       fetchNotion(`/blocks/${encodeURIComponent(id)}/children?page_size=100`),
     ]);
     const properties = page.properties || {};
-    const blocks = (children.results || []).map(mapBlock).filter(Boolean).filter((block) => block.text);
+    const title = propertyText(properties, "Name") || "無題";
+    const blocks = (children.results || []).map(mapBlock).filter(Boolean).filter((block) => block.text || block.url);
 
     response.setHeader("Cache-Control", "no-store");
     response.status(200).json({
       id,
-      title: propertyText(properties, "Name") || "無題",
+      title,
       date: formatPostDate(propertyText(properties, "Date")),
       category: propertyText(properties, "Category") || "稽古",
       author: propertyText(properties, "Author") || "演劇同好会",
       excerpt: propertyText(properties, "Excerpt") || "",
+      imageUrl: propertyFileUrl(properties, ["Image", "画像", "Cover", "Thumbnail", "サムネイル"]),
       likes: propertyNumber(properties, "Likes"),
       blocks,
     });

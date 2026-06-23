@@ -4,6 +4,8 @@ const dateEl = document.querySelector("[data-article-date]");
 const authorEl = document.querySelector("[data-article-author]");
 const excerptEl = document.querySelector("[data-article-excerpt]");
 const bodyEl = document.querySelector("[data-article-body]");
+const heroImageEl = document.querySelector("[data-article-hero]");
+const heroImageTag = document.querySelector("[data-article-hero-img]");
 const likeButton = document.querySelector("[data-article-like]");
 const likeCountEl = document.querySelector("[data-article-likes]");
 const relatedSection = document.querySelector("[data-article-related]");
@@ -21,6 +23,19 @@ function escapeHtml(value) {
 }
 
 function blockHtml(block) {
+  if (block.type === "image") {
+    const url = escapeHtml(block.url);
+    const caption = escapeHtml(block.caption || "");
+    const alt = caption || "稽古記録の画像";
+
+    return `
+      <figure class="article-image">
+        <img src="${url}" alt="${alt}" loading="lazy" />
+        ${caption ? `<figcaption>${caption}</figcaption>` : ""}
+      </figure>
+    `;
+  }
+
   const text = escapeHtml(block.text);
 
   if (block.type === "heading_1") return `<h2>${text}</h2>`;
@@ -31,11 +46,13 @@ function blockHtml(block) {
   return `<p>${text}</p>`;
 }
 
-function blocksHtml(blocks) {
+function blocksHtml(blocks, heroImageUrl = "") {
   const html = [];
   let activeList = "";
 
   blocks.forEach((block) => {
+    if (block.type === "image" && block.url === heroImageUrl) return;
+
     const listType = block.type === "bulleted_list_item" ? "ul" : block.type === "numbered_list_item" ? "ol" : "";
 
     if (listType && listType !== activeList) {
@@ -54,8 +71,24 @@ function blocksHtml(blocks) {
   return html.join("");
 }
 
+function renderArticleHero(post) {
+  if (!heroImageEl || !heroImageTag) return;
+
+  if (!post.imageUrl) {
+    heroImageEl.hidden = true;
+    heroImageTag.removeAttribute("src");
+    heroImageTag.alt = "";
+    return;
+  }
+
+  heroImageTag.src = post.imageUrl;
+  heroImageTag.alt = `${post.title || "稽古記録"}のヘッダー画像`;
+  heroImageEl.hidden = false;
+}
+
 function renderError(message) {
   articleRegion?.setAttribute("aria-busy", "false");
+  renderArticleHero({});
   titleEl.textContent = "稽古記録を表示できません";
   dateEl.textContent = "";
   authorEl.textContent = "";
@@ -174,8 +207,8 @@ async function loadArticle() {
   bodyEl.innerHTML = `
     <div class="loading-note" role="status" aria-live="polite">
       <span class="loading-dot" aria-hidden="true"></span>
-      <strong>Notionの記事本文を確認中</strong>
-      <p>本文、いいね数、関連記事を順に取得する。</p>
+      <strong>記事本文を確認中</strong>
+      <p>本文、いいね数、関連記事を順に取得しています。</p>
     </div>
   `;
 
@@ -190,16 +223,17 @@ async function loadArticle() {
     dateEl.textContent = post.date;
     authorEl.textContent = post.author;
     excerptEl.textContent = post.excerpt;
+    renderArticleHero(post);
     renderLikeButton({ ...post, id });
     articleRegion?.setAttribute("aria-busy", "false");
     bodyEl.innerHTML =
       Array.isArray(post.blocks) && post.blocks.length > 0
-        ? blocksHtml(post.blocks)
-        : "<p>Notion本文はまだ空である。記事ページ本文に段落や見出しを追加すると、ここに反映される。</p>";
+        ? blocksHtml(post.blocks, post.imageUrl)
+        : "<p>本文はまだ公開されていません。</p>";
     renderRelatedPosts({ ...post, id });
   } catch (error) {
     console.warn(error);
-    renderError("Notionの記事本文を取得できなかった。");
+    renderError("稽古記録を現在表示できません。しばらくしてからもう一度お試しください。");
   }
 }
 

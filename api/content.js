@@ -56,6 +56,14 @@ function propertyUrl(properties, names) {
   return "";
 }
 
+function firstPropertyText(properties, names) {
+  for (const name of names) {
+    const value = propertyText(properties, name);
+    if (value) return value;
+  }
+  return "";
+}
+
 function sortShowsForDisplay(shows) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -139,6 +147,7 @@ function mapPost(page) {
     category: propertyText(properties, "Category") || "稽古",
     author: propertyText(properties, "Author") || "演劇同好会",
     excerpt: propertyText(properties, "Excerpt") || propertyText(properties, "Description") || "",
+    imageUrl: propertyFileUrl(properties, ["Image", "画像", "Cover", "Thumbnail", "サムネイル"]),
     likes: propertyNumber(properties, "Likes"),
   };
 }
@@ -153,12 +162,15 @@ function mapShow(page) {
     id,
     href: id ? `/show.html?id=${encodeURIComponent(id)}` : "",
     title: propertyText(properties, "Name") || "無題",
+    shortTitle: firstPropertyText(properties, ["ShortTitle", "Short Title", "略称"]),
     date: propertyText(properties, "DisplayDate") || formattedDate.date,
+    displayDate: propertyText(properties, "DisplayDate"),
     rawDate: dateValue,
     year: propertyText(properties, "Year") || formattedDate.year,
     status: propertyText(properties, "Status") || "公開中",
     venue: propertyText(properties, "Venue") || "会場未定",
     body: propertyText(properties, "Description") || propertyText(properties, "Excerpt") || "",
+    price: firstPropertyText(properties, ["Price", "料金"]),
     flyerUrl: propertyFileUrl(properties, ["Flyer", "FlyerUrl", "Flyer URL", "Flyer Image", "チラシ"]),
     reservationUrl: propertyUrl(properties, ["ReservationUrl", "Reservation URL", "TicketUrl", "Ticket URL", "予約URL"]),
   };
