@@ -46,6 +46,16 @@ function propertyFileUrl(properties, names) {
   return "";
 }
 
+function fileUrl(file) {
+  if (file?.type === "external") return file.external?.url || "";
+  if (file?.type === "file") return file.file?.url || "";
+  return "";
+}
+
+function pageCoverUrl(page) {
+  return fileUrl(page.cover);
+}
+
 function formatPostDate(value) {
   if (!value) return "日付未定";
   const date = new Date(value);
@@ -123,7 +133,7 @@ module.exports = async function handler(request, response) {
       category: propertyText(properties, "Category") || "稽古",
       author: propertyText(properties, "Author") || "演劇同好会",
       excerpt: propertyText(properties, "Excerpt") || "",
-      imageUrl: propertyFileUrl(properties, ["Image", "画像", "Cover", "Thumbnail", "サムネイル"]),
+      imageUrl: pageCoverUrl(page) || propertyFileUrl(properties, ["Image", "画像", "Cover", "Thumbnail", "サムネイル"]),
       likes: propertyNumber(properties, "Likes"),
       blocks,
     });

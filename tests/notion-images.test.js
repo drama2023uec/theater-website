@@ -19,6 +19,7 @@ assert.ok(contentApi.includes('"Image"'), "content API should read the English i
 
 assert.ok(postApi.includes('block.type === "image"'), "post API should keep Notion image blocks");
 assert.ok(postApi.includes("caption"), "post API should expose image captions");
+assert.ok(postApi.includes("pageCoverUrl(page)"), "post API should prefer the Notion page cover for the article hero");
 assert.ok(showApi.includes('block.type === "image"'), "show API should keep Notion image blocks");
 
 assert.ok(journal.includes("post.imageUrl"), "journal archive cards should render optional post images");
@@ -39,6 +40,7 @@ assert.ok(show.includes("activateNaturalImages(blocksEl)"), "show renderer shoul
 assert.ok(styles.includes(".post-card-image"), "CSS should style journal card images");
 assert.ok(styles.includes(".home-pickup-image"), "CSS should style the latest journal image");
 assert.ok(styles.includes(".article-hero-image"), "CSS should style article header images");
+assert.ok(styles.includes("width: 100vw"), "CSS should make article header images edge-to-edge");
 assert.ok(styles.includes(".article-image"), "CSS should style article body images");
 assert.ok(styles.includes(".notion-image img"), "CSS should style natural Notion images");
 assert.ok(styles.includes("var(--image-natural-width"), "CSS should respect the image natural width");
