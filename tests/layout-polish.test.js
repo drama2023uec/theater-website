@@ -13,6 +13,7 @@ assert.ok(articleShellRule.includes("padding: 96px 0 96px"), "article hero shoul
 const metricsRule = styles.match(/\.metrics\s*\{[\s\S]*?\n\}/)?.[0] || "";
 const desktopMetricsRule = styles.match(/@media \(min-width: 1100px\) \{[\s\S]*?\.metrics\s*\{[\s\S]*?\n  \}[\s\S]*?\n\}/)?.[0] || "";
 assert.ok(metricsRule.includes("justify-self: start"), "about metrics should keep the narrow-layout default");
+assert.match(styles, /@media \(min-width: 1100px\) \{[\s\S]*?\.about-layout\s*\{[\s\S]*?max-width: none;[\s\S]*?width: 100%;/, "desktop about layout should span the viewport so metrics can tuck near the photo edge");
 assert.ok(desktopMetricsRule.includes("justify-self: end"), "desktop about metrics should sit to the right on PC widths");
 assert.ok(desktopMetricsRule.includes("transform: translateX(clamp(28px, 4vw, 52px))"), "desktop about metrics should move closer to the photo edge without crossing it");
 assert.ok(!styles.includes("transform: translateX(clamp(36px, 6vw, 96px))"), "desktop about metrics should not use the old overflow push");

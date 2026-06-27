@@ -757,6 +757,11 @@ h3 {
 }
 
 @media (min-width: 1100px) {
+  .about-layout {
+    max-width: none;
+    width: 100%;
+  }
+
   .metrics {
     justify-self: end;
     transform: translateX(clamp(28px, 4vw, 52px));

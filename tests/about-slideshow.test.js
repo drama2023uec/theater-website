@@ -91,6 +91,11 @@ assert.match(
 );
 assert.match(
   styles,
+  /@media \(min-width: 1100px\) \{[\s\S]*?\.about-layout \{[\s\S]*?max-width: none;[\s\S]*?width: 100%;/,
+  "desktop about layout should span the viewport so metrics can reach the photo side"
+);
+assert.match(
+  styles,
   /\.program-poster-panel \.show-flyer\.is-large \{[\s\S]*?object-fit: cover;/,
   "featured flyer image should fill the A4 frame"
 );
