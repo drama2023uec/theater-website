@@ -1792,21 +1792,23 @@ h3 {
   font-weight: 700;
 }
 
-.article-image {
+.article-image,
+.show-body-image {
   margin: 38px 0;
 }
 
-.article-image img {
-  width: 100%;
-  max-height: 520px;
+.notion-image img {
+  width: min(100%, var(--image-natural-width, 100%));
+  max-width: 100%;
+  height: auto;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
   background: rgba(23, 20, 18, 0.08);
   box-shadow: 0 18px 42px rgba(23, 20, 18, 0.12);
 }
 
-.article-image figcaption {
+.notion-image figcaption {
   margin-top: 10px;
   color: var(--muted);
   font-size: 14px;

@@ -3,7 +3,7 @@ const fs = require("fs");
 const vm = require("vm");
 
 const showHtml = fs.readFileSync("show.html", "utf8");
-assert.ok(showHtml.includes("./show.js?v=20260624d"), "show detail page should load the bumped gallery script asset");
+assert.ok(showHtml.includes("./show.js?v=20260627a"), "show detail page should load the bumped gallery script asset");
 
 function createElement() {
   return {

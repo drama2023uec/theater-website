@@ -91,6 +91,15 @@ function formatShowDate(value) {
 function mapBlock(block) {
   const data = block[block.type] || {};
 
+  if (block.type === "image") {
+    const url = data.type === "external" ? data.external?.url || "" : data.file?.url || "";
+    return {
+      type: block.type,
+      url,
+      caption: plainText(data.caption),
+    };
+  }
+
   if (["paragraph", "heading_1", "heading_2", "heading_3", "quote", "bulleted_list_item", "numbered_list_item"].includes(block.type)) {
     return {
       type: block.type,
@@ -137,7 +146,10 @@ module.exports = async function handler(request, response) {
     const properties = page.properties || {};
     const title = propertyText(properties, "Name") || "無題";
     const formattedDate = formatShowDate(propertyText(properties, "Date"));
-    const blocks = (children.results || []).map(mapBlock).filter(Boolean).filter((block) => block.text);
+    const blocks = (children.results || [])
+      .map(mapBlock)
+      .filter(Boolean)
+      .filter((block) => block.url || String(block.text || "").trim());
     const flyerUrls = propertyFileUrls(properties, ["Flyer", "FlyerUrl", "Flyer URL", "Flyer Image", "チラシ"]);
 
     response.setHeader("Cache-Control", "no-store");

@@ -18,7 +18,7 @@ assert.ok(articleHtml.includes("data-article-comment-form"), "article page shoul
 assert.ok(articleHtml.includes("data-article-comment-list"), "article page should include a comment list");
 assert.ok(articleHtml.includes("data-article-comment-status"), "article page should include a comment status region");
 assert.ok(articleHtml.includes('name="website"'), "comment form should include a honeypot field");
-assert.ok(articleHtml.includes("article.js?v=20260627b"), "article page should load the updated article script");
+assert.ok(articleHtml.includes("article.js?v=20260627c"), "article page should load the updated article script");
 
 assert.ok(articleJs.includes("commentFormEl"), "article script should bind the comment form");
 assert.ok(articleJs.includes("loadComments"), "article script should load comments");

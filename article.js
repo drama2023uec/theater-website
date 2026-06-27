@@ -43,8 +43,8 @@ function blockHtml(block) {
     const alt = caption || "稽古記録の画像";
 
     return `
-      <figure class="article-image">
-        <img src="${url}" alt="${alt}" loading="lazy" />
+      <figure class="article-image notion-image">
+        <img src="${url}" alt="${alt}" loading="lazy" decoding="async" data-natural-image />
         ${caption ? `<figcaption>${caption}</figcaption>` : ""}
       </figure>
     `;
@@ -83,6 +83,28 @@ function blocksHtml(blocks, heroImageUrl = "") {
 
   if (activeList) html.push(`</${activeList}>`);
   return html.join("");
+}
+
+function applyNaturalImageSize(image) {
+  const width = image.naturalWidth;
+  const height = image.naturalHeight;
+  if (!width || !height) return;
+
+  image.style.setProperty("--image-natural-width", `${width}px`);
+  image.style.setProperty("--image-natural-height", `${height}px`);
+  image.setAttribute("width", String(width));
+  image.setAttribute("height", String(height));
+}
+
+function activateNaturalImages(root = document) {
+  root.querySelectorAll("[data-natural-image]").forEach((image) => {
+    if (image.complete) {
+      applyNaturalImageSize(image);
+      return;
+    }
+
+    image.addEventListener("load", () => applyNaturalImageSize(image), { once: true });
+  });
 }
 
 function renderArticleHero(post) {
@@ -309,6 +331,7 @@ async function loadArticle() {
       Array.isArray(post.blocks) && post.blocks.length > 0
         ? blocksHtml(post.blocks, post.imageUrl)
         : "<p>本文はまだ公開されていません。</p>";
+    activateNaturalImages(bodyEl);
     loadComments(id);
     renderRelatedPosts({ ...post, id });
   } catch (error) {

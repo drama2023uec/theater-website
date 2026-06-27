@@ -24,6 +24,19 @@ function escapeHtml(value) {
 }
 
 function blockHtml(block) {
+  if (block.type === "image") {
+    const url = escapeHtml(block.url);
+    const caption = escapeHtml(block.caption || "");
+    const alt = caption || "公演情報の画像";
+
+    return `
+      <figure class="show-body-image notion-image">
+        <img src="${url}" alt="${alt}" loading="lazy" decoding="async" data-natural-image />
+        ${caption ? `<figcaption>${caption}</figcaption>` : ""}
+      </figure>
+    `;
+  }
+
   const text = escapeHtml(block.text);
 
   if (block.type === "heading_1") return `<h2>${text}</h2>`;
@@ -55,6 +68,28 @@ function blocksHtml(blocks) {
 
   if (activeList) html.push(`</${activeList}>`);
   return html.join("");
+}
+
+function applyNaturalImageSize(image) {
+  const width = image.naturalWidth;
+  const height = image.naturalHeight;
+  if (!width || !height) return;
+
+  image.style.setProperty("--image-natural-width", `${width}px`);
+  image.style.setProperty("--image-natural-height", `${height}px`);
+  image.setAttribute("width", String(width));
+  image.setAttribute("height", String(height));
+}
+
+function activateNaturalImages(root = document) {
+  root.querySelectorAll("[data-natural-image]").forEach((image) => {
+    if (image.complete) {
+      applyNaturalImageSize(image);
+      return;
+    }
+
+    image.addEventListener("load", () => applyNaturalImageSize(image), { once: true });
+  });
 }
 
 function showDate(show) {
@@ -330,6 +365,7 @@ function renderShow(show) {
   setReservationLink(reservationEl, show);
   setReservationLink(afterReservationEl, show);
   blocksEl.innerHTML = renderShowBlocks(show);
+  activateNaturalImages(blocksEl);
 }
 
 function renderLoading() {
