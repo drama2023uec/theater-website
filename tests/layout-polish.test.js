@@ -11,23 +11,26 @@ const articleShellRule = styles.match(/\.article-shell\s*\{[\s\S]*?\n\}/)?.[0] |
 assert.ok(articleShellRule.includes("padding: 96px 0 96px"), "article hero should move upward after the back link moved below it");
 
 const metricsRule = styles.match(/\.metrics\s*\{[\s\S]*?\n\}/)?.[0] || "";
-assert.ok(metricsRule.includes("justify-self: start"), "desktop about metrics should sit to the left on PC widths");
-assert.ok(!styles.includes("transform: translateX(clamp(36px, 6vw, 96px))"), "desktop about metrics should not be pushed to the right");
+const desktopMetricsRule = styles.match(/@media \(min-width: 1100px\) \{[\s\S]*?\.metrics\s*\{[\s\S]*?\n  \}[\s\S]*?\n\}/)?.[0] || "";
+assert.ok(metricsRule.includes("justify-self: start"), "about metrics should keep the narrow-layout default");
+assert.ok(desktopMetricsRule.includes("justify-self: end"), "desktop about metrics should sit to the right on PC widths");
+assert.ok(!styles.includes("transform: translateX(clamp(36px, 6vw, 96px))"), "desktop about metrics should not use the old overflow push");
 
-const categoryButtons = ["稽古", "役者", "裏方", "告知", "その他"];
+const categoryButtons = ["all", "稽古", "役者", "裏方", "告知", "その他"];
 for (const html of [index, journalHtml]) {
   for (const category of categoryButtons) {
     assert.ok(html.includes(`data-filter="${category}"`), `journal filters should include ${category}`);
   }
-  assert.ok(!html.includes('data-filter="all"'), "journal filters should not include the old all tab");
+  assert.ok(html.indexOf('data-filter="all"') < html.indexOf('data-filter="稽古"'), "journal filters should put ALL before rehearsal");
+  assert.ok(html.includes('data-filter="all" role="tab" aria-selected="true">ALL</button>'), "ALL should be the active first journal filter");
   assert.ok(!html.includes('data-filter="制作"'), "journal filters should not include the old production tab");
 }
 const segmentedRule = styles.match(/^\.segmented\s*\{[\s\S]*?\n\}/m)?.[0] || "";
 const segmentedButtonRule = styles.match(/^\.segmented button\s*\{[\s\S]*?\n\}/m)?.[0] || "";
-assert.ok(segmentedRule.includes("grid-template-columns: repeat(5, 1fr)"), "journal filter buttons should stay on one row with five columns");
+assert.ok(segmentedRule.includes("grid-template-columns: repeat(6, 1fr)"), "journal filter buttons should stay on one row with six columns");
 assert.ok(segmentedButtonRule.includes("white-space: nowrap"), "journal filter labels should not break inside the one-row controls");
-assert.ok(script.includes('const DEFAULT_POST_FILTER = "稽古"'), "home journal should keep rehearsal as the default filter");
-assert.ok(journal.includes('const DEFAULT_POST_FILTER = "稽古"'), "journal archive should keep rehearsal as the default filter");
+assert.ok(script.includes('const DEFAULT_POST_FILTER = "all"'), "home journal should show all posts by default");
+assert.ok(journal.includes('const DEFAULT_POST_FILTER = "all"'), "journal archive should show all posts by default");
 assert.ok(script.includes("chooseContentFilter"), "home journal should fall back to a category that has posts");
 assert.ok(journal.includes("chooseContentFilter"), "journal archive should fall back to a category that has posts");
 

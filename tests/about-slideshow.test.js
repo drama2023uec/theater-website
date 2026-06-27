@@ -73,11 +73,11 @@ assert.ok(index.includes("<strong>火・金</strong>"), "activity day metric sho
 assert.ok(!index.includes("<strong>10,000円</strong>"), "annual fee should not be shown as an about metric");
 assert.ok(!index.includes("<small>前期5,000円 / 後期5,000円</small>"), "about metrics should not show the semester fee split");
 assert.ok(index.includes("年10,000円（前期5,000円、後期5,000円）"), "join fee should show the formatted annual fee and semester split");
-assert.match(styles, /\.metrics \{[\s\S]*?justify-self: start;[\s\S]*?align-self: end;/, "desktop about metrics should sit at the lower-left of the metric column");
+assert.match(styles, /\.metrics \{[\s\S]*?justify-self: start;[\s\S]*?align-self: end;/, "about metrics should keep the narrow-layout default position");
 assert.match(
   styles,
-  /@media \(min-width: 1100px\) \{[\s\S]*?\.metrics \{[\s\S]*?transform: none;/,
-  "desktop about metrics should not be pushed right on PC widths"
+  /@media \(min-width: 1100px\) \{[\s\S]*?\.metrics \{[\s\S]*?justify-self: end;[\s\S]*?transform: none;/,
+  "desktop about metrics should be right-aligned on PC widths without overflow translation"
 );
 assert.ok(
   !styles.includes("clamp(42px, 6vw, 74px)"),
