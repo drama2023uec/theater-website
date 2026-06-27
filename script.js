@@ -44,6 +44,58 @@ function showSummary(show) {
   return show.body || show.description || "公演情報を準備中です。";
 }
 
+function validExternalUrl(value) {
+  const text = String(value || "").trim();
+  return /^https?:\/\/\S+$/i.test(text) ? text : "";
+}
+
+function programTitleHtml(title) {
+  const text = String(title || "公演情報");
+  const quoteIndex = ["「", "『"]
+    .map((quote) => text.indexOf(quote))
+    .filter((index) => index >= 0)
+    .sort((a, b) => a - b)[0];
+  if (quoteIndex === undefined) return escapeHtml(text);
+
+  const prefix = text.slice(0, quoteIndex).trimEnd();
+  const quoted = text.slice(quoteIndex).trimStart();
+  return `
+    ${prefix ? `<span class="program-title-prefix">${escapeHtml(prefix)}</span>` : ""}
+    <span class="program-title-quoted">${escapeHtml(quoted)}</span>
+  `;
+}
+
+function showTime(show, fallback = Number.POSITIVE_INFINITY) {
+  const date = new Date(show.rawDate || "");
+  return Number.isNaN(date.getTime()) ? fallback : date.getTime();
+}
+
+function isPastProgram(show, now = new Date()) {
+  if (show.status === "終了") return true;
+  if (!show.rawDate) return false;
+  const date = new Date(`${show.rawDate}T23:59:59`);
+  return !Number.isNaN(date.getTime()) && date < now;
+}
+
+function selectHomeProgramShows(shows, now = new Date()) {
+  const indexedShows = shows.map((show, index) => ({ show, index }));
+  const byUpcomingDate = (a, b) => showTime(a.show) - showTime(b.show) || a.index - b.index;
+  const byPastDate = (a, b) =>
+    showTime(b.show, Number.NEGATIVE_INFINITY) - showTime(a.show, Number.NEGATIVE_INFINITY) || a.index - b.index;
+  const upcoming = indexedShows.filter(({ show }) => !isPastProgram(show, now)).sort(byUpcomingDate);
+  const past = indexedShows.filter(({ show }) => isPastProgram(show, now)).sort(byPastDate);
+  const featuredEntry = upcoming[0] || past[0];
+
+  if (!featuredEntry) return { featured: null, secondary: [] };
+
+  return {
+    featured: featuredEntry.show,
+    secondary: [...upcoming.filter((entry) => entry !== featuredEntry), ...past.filter((entry) => entry !== featuredEntry)]
+      .slice(0, 3)
+      .map(({ show }) => show),
+  };
+}
+
 function flyerHtml(show, size = "small") {
   if (show.flyerUrl) {
     return `<img class="show-flyer ${size === "large" ? "is-large" : ""}" src="${escapeHtml(show.flyerUrl)}" alt="${escapeHtml(show.title)}のチラシ" />`;
@@ -52,7 +104,7 @@ function flyerHtml(show, size = "small") {
   return `
     <div class="show-flyer poster-fallback ${size === "large" ? "is-large" : ""}" aria-label="${escapeHtml(show.title)}のチラシ">
       <span>${escapeHtml(show.status || "公開中")}</span>
-      <strong>${escapeHtml(show.title || "公演情報")}</strong>
+      <strong>${programTitleHtml(show.title)}</strong>
       <em>${escapeHtml(show.date || "日程未定")} ${escapeHtml(show.year || "")}</em>
     </div>
   `;
@@ -60,7 +112,7 @@ function flyerHtml(show, size = "small") {
 
 function renderHeroProgram() {
   if (!heroProgramRoot) return;
-  const show = currentShows[0];
+  const { featured: show } = selectHomeProgramShows(currentShows);
 
   if (!show) {
     heroProgramRoot.innerHTML = `
@@ -73,25 +125,29 @@ function renderHeroProgram() {
     `;
     return;
   }
+  const reservationUrl = validExternalUrl(show.reservationUrl);
 
   heroProgramRoot.innerHTML = `
-    <div class="hero-program-topline">
-      <span class="label">next program</span>
-      <span class="hero-program-status">${escapeHtml(show.status || "公開中")}</span>
+    <div class="hero-program-main">
+      <a class="hero-program-flyer" href="${escapeHtml(showHref(show))}" aria-label="${escapeHtml(show.title)}の公演詳細を見る">
+        ${flyerHtml(show)}
+      </a>
+      <div class="hero-program-copy">
+        <div class="hero-program-topline">
+          <span class="label">next program</span>
+          <span class="hero-program-status">${escapeHtml(show.status || "公開中")}</span>
+        </div>
+        <h2>${programTitleHtml(show.shortTitle || show.title)}</h2>
+        <dl>
+          <div>
+            <dt>日程</dt>
+            <dd>${escapeHtml(showDate(show))}</dd>
+          </div>
+        </dl>
+      </div>
     </div>
-    <h2>${escapeHtml(show.shortTitle || show.title)}</h2>
-    <dl>
-      <div>
-        <dt>日程</dt>
-        <dd>${escapeHtml(showDate(show))}</dd>
-      </div>
-      <div>
-        <dt>会場</dt>
-        <dd>${escapeHtml(show.venue || "会場未定")}</dd>
-      </div>
-    </dl>
     <div class="hero-program-actions">
-      ${show.reservationUrl ? `<a class="button primary" href="${escapeHtml(show.reservationUrl)}" target="_blank" rel="noopener">予約する</a>` : ""}
+      ${reservationUrl ? `<a class="button primary" href="${escapeHtml(reservationUrl)}" target="_blank" rel="noopener">予約する</a>` : ""}
       <a class="button secondary" href="${escapeHtml(showHref(show))}">公演詳細を見る</a>
     </div>
   `;
@@ -99,8 +155,7 @@ function renderHeroProgram() {
 
 function renderShows() {
   if (!showRoot) return;
-  const featured = currentShows[0];
-  const secondary = currentShows.slice(1, 4);
+  const { featured, secondary } = selectHomeProgramShows(currentShows);
   showRoot.classList.toggle("show-grid-single", secondary.length === 0);
 
   if (!featured) {
@@ -132,7 +187,7 @@ function renderShows() {
           <span class="label">latest program</span>
           <span class="card-kicker">${escapeHtml(featured.status || "公開中")}</span>
         </div>
-        <h3>${escapeHtml(featured.title)}</h3>
+        <h3>${programTitleHtml(featured.title)}</h3>
         <p>${escapeHtml(showSummary(featured))}</p>
         <dl class="show-facts program-facts">
           <div>
@@ -149,7 +204,11 @@ function renderShows() {
           </div>
         </dl>
         <div class="program-actions">
-          ${featured.reservationUrl ? `<a class="button primary" href="${escapeHtml(featured.reservationUrl)}" target="_blank" rel="noopener">予約する</a>` : ""}
+          ${
+            validExternalUrl(featured.reservationUrl)
+              ? `<a class="button primary" href="${escapeHtml(validExternalUrl(featured.reservationUrl))}" target="_blank" rel="noopener">予約する</a>`
+              : ""
+          }
           <a class="button secondary surface" href="${escapeHtml(showHref(featured))}">公演詳細を見る</a>
         </div>
       </div>
@@ -160,6 +219,7 @@ function renderShows() {
 }
 
 function miniShowHtml(show) {
+  const reservationUrl = validExternalUrl(show.reservationUrl);
   return `
     <article class="mini-show-card reveal">
       <a class="flyer-link" href="${escapeHtml(showHref(show))}">
@@ -170,10 +230,10 @@ function miniShowHtml(show) {
           <span>${escapeHtml(showDate(show))}</span>
           <span class="card-kicker">${escapeHtml(show.status || "公開中")}</span>
         </div>
-        <h3><a href="${escapeHtml(showHref(show))}">${escapeHtml(show.title)}</a></h3>
+        <h3><a href="${escapeHtml(showHref(show))}">${programTitleHtml(show.title)}</a></h3>
         <p>${escapeHtml(show.venue || "会場未定")}</p>
-        <a class="mini-show-link" href="${escapeHtml(show.reservationUrl || showHref(show))}" ${show.reservationUrl ? 'target="_blank" rel="noopener"' : ""}>${
-          show.reservationUrl ? "予約" : "詳細"
+        <a class="mini-show-link" href="${escapeHtml(reservationUrl || showHref(show))}" ${reservationUrl ? 'target="_blank" rel="noopener"' : ""}>${
+          reservationUrl ? "予約" : "詳細"
         }</a>
       </div>
     </article>

@@ -11,5 +11,7 @@ for (const file of htmlFiles) {
 
 const styles = fs.readFileSync("styles.css", "utf8");
 
+assert.match(styles, /html \{[\s\S]*?overflow-x: clip;/, "root should clip horizontal overflow from animated layers");
+assert.match(styles, /body \{[\s\S]*?overflow-x: hidden;/, "body should not expose horizontal scroll");
 assert.ok(styles.includes("@media (max-width: 820px)"), "tablet layout should start below PC-ish widths");
 assert.ok(!styles.includes("@media (max-width: 900px)"), "900px should not trigger the compact tablet layout");

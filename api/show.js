@@ -23,18 +23,31 @@ function propertyText(properties, name) {
 }
 
 function propertyFileUrl(properties, names) {
+  return propertyFileUrls(properties, names)[0] || "";
+}
+
+function propertyFileUrls(properties, names) {
   for (const name of names) {
     const prop = properties[name];
     if (!prop) continue;
     if (prop.type === "files") {
-      const file = prop.files?.[0];
-      if (file?.type === "external") return file.external?.url || "";
-      if (file?.type === "file") return file.file?.url || "";
+      return (prop.files || [])
+        .map((file) => {
+          if (file?.type === "external") return file.external?.url || "";
+          if (file?.type === "file") return file.file?.url || "";
+          return "";
+        })
+        .filter(Boolean);
     }
-    if (prop.type === "url") return prop.url || "";
-    if (prop.type === "rich_text") return plainText(prop.rich_text);
+    if (prop.type === "url") return prop.url ? [prop.url] : [];
+    if (prop.type === "rich_text") {
+      return plainText(prop.rich_text)
+        .split(/\n|,/)
+        .map((url) => url.trim())
+        .filter(Boolean);
+    }
   }
-  return "";
+  return [];
 }
 
 function propertyUrl(properties, names) {
@@ -125,6 +138,7 @@ module.exports = async function handler(request, response) {
     const title = propertyText(properties, "Name") || "無題";
     const formattedDate = formatShowDate(propertyText(properties, "Date"));
     const blocks = (children.results || []).map(mapBlock).filter(Boolean).filter((block) => block.text);
+    const flyerUrls = propertyFileUrls(properties, ["Flyer", "FlyerUrl", "Flyer URL", "Flyer Image", "チラシ"]);
 
     response.setHeader("Cache-Control", "no-store");
     response.status(200).json({
@@ -153,7 +167,8 @@ module.exports = async function handler(request, response) {
       notes: propertyList(properties, ["Notes", "注意事項"]),
       contact: firstPropertyText(properties, ["Contact", "問い合わせ"]),
       body: propertyText(properties, "Description") || "",
-      flyerUrl: propertyFileUrl(properties, ["Flyer", "FlyerUrl", "Flyer URL", "Flyer Image", "チラシ"]),
+      flyerUrl: flyerUrls[0] || "",
+      flyerUrls,
       reservationUrl: propertyUrl(properties, ["ReservationUrl", "Reservation URL", "TicketUrl", "Ticket URL", "予約URL"]),
       blocks,
     });

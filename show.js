@@ -65,6 +65,27 @@ function showSummary(show) {
   return show.body || show.description || "公演情報を準備中です。";
 }
 
+function validExternalUrl(value) {
+  const text = String(value || "").trim();
+  return /^https?:\/\/\S+$/i.test(text) ? text : "";
+}
+
+function programTitleHtml(title) {
+  const text = String(title || "公演情報");
+  const quoteIndex = ["「", "『"]
+    .map((quote) => text.indexOf(quote))
+    .filter((index) => index >= 0)
+    .sort((a, b) => a - b)[0];
+  if (quoteIndex === undefined) return escapeHtml(text);
+
+  const prefix = text.slice(0, quoteIndex).trimEnd();
+  const quoted = text.slice(quoteIndex).trimStart();
+  return `
+    ${prefix ? `<span class="program-title-prefix">${escapeHtml(prefix)}</span>` : ""}
+    <span class="program-title-quoted">${escapeHtml(quoted)}</span>
+  `;
+}
+
 function renderError(message) {
   showRegion?.setAttribute("aria-busy", "false");
   titleEl.textContent = "公演情報を表示できません";
@@ -83,25 +104,111 @@ function renderError(message) {
   afterCopyEl.textContent = message;
 }
 
+function showFlyerUrls(show) {
+  const urls = Array.isArray(show.flyerUrls) ? show.flyerUrls.filter(Boolean) : [];
+  return urls.length ? urls : show.flyerUrl ? [show.flyerUrl] : [];
+}
+
 function flyerHtml(show) {
-  if (show.flyerUrl) {
-    return `<img class="show-flyer is-large" src="${escapeHtml(show.flyerUrl)}" alt="${escapeHtml(show.title)}のチラシ" />`;
+  const urls = showFlyerUrls(show);
+
+  if (urls.length === 1) {
+    return `<img class="show-flyer is-large" src="${escapeHtml(urls[0])}" alt="${escapeHtml(show.title)}のチラシ" />`;
+  }
+
+  if (urls.length > 1) {
+    return `
+      <div class="show-flyer-gallery" data-show-flyer-gallery aria-label="${escapeHtml(show.title)}の公演画像">
+        <div class="show-flyer-viewport">
+          <div class="show-flyer-track" data-gallery-track>
+            ${urls
+              .map(
+                (url, index) => `
+                  <figure class="show-flyer-slide" aria-hidden="${index === 0 ? "false" : "true"}">
+                    <img class="show-flyer is-large" src="${escapeHtml(url)}" alt="${escapeHtml(show.title)}の画像${index + 1}" aria-label="公演画像 ${
+                  index + 1
+                } / ${urls.length}" />
+                  </figure>
+                `,
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="show-flyer-controls" aria-label="画像切り替え">
+          <button class="show-flyer-nav" type="button" data-gallery-action="prev" aria-label="前の画像">&lsaquo;</button>
+          <div class="show-flyer-dots" aria-label="画像番号">
+            ${urls
+              .map(
+                (_, index) => `
+                  <button class="show-flyer-dot ${index === 0 ? "is-active" : ""}" type="button" data-gallery-dot="${index}" aria-label="画像${
+                  index + 1
+                }へ移動" aria-current="${index === 0 ? "true" : "false"}"></button>
+                `,
+              )
+              .join("")}
+          </div>
+          <span class="show-flyer-count"><span data-gallery-current>1</span> / ${urls.length}</span>
+          <button class="show-flyer-nav" type="button" data-gallery-action="next" aria-label="次の画像">&rsaquo;</button>
+        </div>
+      </div>
+    `;
   }
 
   return `
     <div class="show-flyer poster-fallback is-large" aria-label="${escapeHtml(show.title)}のチラシ">
       <span>${escapeHtml(show.status || "公開中")}</span>
-      <strong>${escapeHtml(show.title || "公演情報")}</strong>
+      <strong>${programTitleHtml(show.title)}</strong>
       <em>${escapeHtml(show.date || "日程未定")} ${escapeHtml(show.year || "")}</em>
     </div>
   `;
 }
 
+function setupShowFlyerGallery() {
+  const gallery = flyerEl?.querySelector("[data-show-flyer-gallery]");
+  if (!gallery) return;
+
+  const track = gallery.querySelector("[data-gallery-track]");
+  const slides = Array.from(gallery.querySelectorAll(".show-flyer-slide"));
+  const controls = Array.from(gallery.querySelectorAll("[data-gallery-action]"));
+  const dots = Array.from(gallery.querySelectorAll("[data-gallery-dot]"));
+  const current = gallery.querySelector("[data-gallery-current]");
+  let activeIndex = 0;
+
+  function update(nextIndex) {
+    activeIndex = Math.max(0, Math.min(nextIndex, slides.length - 1));
+    track.style.transform = `translateX(-${activeIndex * 100}%)`;
+    slides.forEach((slide, index) => slide.setAttribute("aria-hidden", index === activeIndex ? "false" : "true"));
+    dots.forEach((dot, index) => {
+      dot.classList.toggle("is-active", index === activeIndex);
+      dot.setAttribute("aria-current", index === activeIndex ? "true" : "false");
+    });
+    controls.forEach((button) => {
+      const action = button.dataset.galleryAction;
+      button.disabled = (action === "prev" && activeIndex === 0) || (action === "next" && activeIndex === slides.length - 1);
+    });
+    if (current) current.textContent = String(activeIndex + 1);
+  }
+
+  gallery.addEventListener("click", (event) => {
+    const actionButton = event.target.closest("[data-gallery-action]");
+    if (actionButton) {
+      update(activeIndex + (actionButton.dataset.galleryAction === "next" ? 1 : -1));
+      return;
+    }
+
+    const dotButton = event.target.closest("[data-gallery-dot]");
+    if (dotButton) update(Number(dotButton.dataset.galleryDot));
+  });
+
+  update(0);
+}
+
 function setReservationLink(link, show) {
   if (!link) return;
-  if (show?.reservationUrl) {
-    link.href = show.reservationUrl;
-    link.textContent = show.reservationUrl.includes("teket.jp") ? "Teketで予約する" : "予約ページへ";
+  const reservationUrl = validExternalUrl(show?.reservationUrl);
+  if (reservationUrl) {
+    link.href = reservationUrl;
+    link.textContent = reservationUrl.includes("teket.jp") ? "Teketで予約する" : "予約ページへ";
     link.target = "_blank";
     link.rel = "noopener";
     link.removeAttribute("aria-disabled");
@@ -203,9 +310,10 @@ function renderShowBlocks(show) {
 }
 
 function renderShow(show) {
+  const reservationUrl = validExternalUrl(show.reservationUrl);
   showRegion?.setAttribute("aria-busy", "false");
   document.title = `${show.title} | 電気通信大学演劇同好会`;
-  titleEl.textContent = show.title;
+  titleEl.innerHTML = programTitleHtml(show.title);
   statusEl.textContent = show.status || "公開中";
   ticketStatusEl.textContent = show.status || "公開中";
   bodyEl.textContent = showSummary(show);
@@ -213,8 +321,11 @@ function renderShow(show) {
   yearEl.textContent = show.year || "";
   venueEl.textContent = show.venue || "会場未定";
   flyerEl.innerHTML = flyerHtml(show);
+  setupShowFlyerGallery();
   afterStatusEl.textContent = show.status || "公開中";
-  afterTitleEl.textContent = show.reservationUrl ? `${show.shortTitle || show.title}を予約する` : `${show.shortTitle || show.title}について問い合わせる`;
+  afterTitleEl.innerHTML = programTitleHtml(
+    reservationUrl ? `${show.shortTitle || show.title}を予約する` : `${show.shortTitle || show.title}について問い合わせる`,
+  );
   afterCopyEl.textContent = `${showDate(show)} / ${show.venue || "会場未定"}`;
   setReservationLink(reservationEl, show);
   setReservationLink(afterReservationEl, show);

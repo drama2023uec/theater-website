@@ -30,6 +30,11 @@ for (const asset of slideAssets) {
 
 assert.ok(styles.includes("@keyframes aboutSlideShow"), "CSS should define the slideshow animation");
 assert.ok(styles.includes("prefers-reduced-motion: reduce"), "slideshow should respect reduced motion");
+assert.match(
+  styles,
+  /\.about-slideshow \{[\s\S]*?overflow: hidden;[\s\S]*?contain: paint;/,
+  "about slideshow should clip scaled slides so they do not create horizontal scroll"
+);
 const aboutKeyframesStart = styles.indexOf("@keyframes aboutSlideShow");
 const aboutKeyframesEnd = styles.indexOf("@media (prefers-reduced-motion: reduce)", aboutKeyframesStart);
 const aboutKeyframes = styles.slice(aboutKeyframesStart, aboutKeyframesEnd);
@@ -64,9 +69,20 @@ assert.ok(styles.includes(".flow li::before"), "making flow should include a vis
 assert.ok(styles.includes(".flow li::after"), "making flow should include a visual process node");
 
 assert.ok(index.includes("<strong>15人</strong>"), "member metric should include the people unit");
-assert.ok(index.includes("<strong>10,000円</strong>"), "annual fee metric should use yen formatting");
-assert.ok(index.includes("<small>前期5,000円 / 後期5,000円</small>"), "annual fee metric should show semester split");
+assert.ok(index.includes("<strong>火・金</strong>"), "activity day metric should remain visible");
+assert.ok(!index.includes("<strong>10,000円</strong>"), "annual fee should not be shown as an about metric");
+assert.ok(!index.includes("<small>前期5,000円 / 後期5,000円</small>"), "about metrics should not show the semester fee split");
 assert.ok(index.includes("年10,000円（前期5,000円、後期5,000円）"), "join fee should show the formatted annual fee and semester split");
+assert.match(styles, /\.metrics \{[\s\S]*?align-self: end;/, "desktop about metrics should sit at the lower-right of the text column");
+assert.match(
+  styles,
+  /@media \(min-width: 1100px\) \{[\s\S]*?\.metrics \{[\s\S]*?transform: translateX\(clamp\(36px, 6vw, 96px\)\);/,
+  "desktop about metrics should move right on PC widths while keeping the bottom aligned"
+);
+assert.ok(
+  !styles.includes("clamp(42px, 6vw, 74px)"),
+  "desktop about metrics should not be pushed below the members note baseline"
+);
 
 assert.match(
   styles,
