@@ -65,6 +65,13 @@ async function loadPostWithCover() {
   const post = await loadPostWithCover();
   assert.strictEqual(post.imageUrl, "https://example.com/notion-cover.jpg", "post API should prefer the Notion page cover for the article hero");
 
+  const articleHtml = fs.readFileSync("article.html", "utf8");
+  const heroIndex = articleHtml.indexOf('class="article-hero-image"');
+  const backLinkIndex = articleHtml.indexOf('class="back-link"');
+  assert.ok(heroIndex !== -1, "article page should include the hero image before article content");
+  assert.ok(backLinkIndex !== -1, "article page should include the journal back link");
+  assert.ok(heroIndex < backLinkIndex, "journal back link should sit below the article hero image");
+
   const styles = fs.readFileSync("styles.css", "utf8");
   const heroRule = styles.match(/\.article-hero-image\s*\{[\s\S]*?\n\}/)?.[0] || "";
   assert.ok(heroRule.includes("width: 100vw"), "article hero should span the viewport width");
