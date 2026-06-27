@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=20260622l" />
+    <link rel="stylesheet" href="./styles.css?v=20260627a" />
   </head>
   <body class="article-page">
     <header class="site-header is-solid" data-header>
@@ -37,12 +37,32 @@
           <span data-article-author>演劇同好会</span>
         </div>
         <h1 data-article-title>稽古記録を読み込み中</h1>
+        <p class="article-lead" data-article-excerpt></p>
         <button class="like-button article-like" type="button" data-article-like hidden>
           <span class="heart-icon" aria-hidden="true">♥</span>
           <strong data-article-likes>0</strong>
         </button>
-        <p class="article-lead" data-article-excerpt></p>
         <div class="article-body" data-article-body></div>
+        <section class="article-comments" data-article-comments>
+          <div class="article-comments-header">
+            <span class="label">comments</span>
+            <h2>コメント</h2>
+          </div>
+          <p class="article-comment-status" data-article-comment-status aria-live="polite">コメントを確認中</p>
+          <div class="article-comment-list" data-article-comment-list></div>
+          <form class="article-comment-form" data-article-comment-form>
+            <label>
+              <span>名前</span>
+              <input type="text" name="author" maxlength="30" autocomplete="name" placeholder="匿名" />
+            </label>
+            <label>
+              <span>コメント</span>
+              <textarea name="body" maxlength="800" rows="4" required></textarea>
+            </label>
+            <input class="comment-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button class="button primary" type="submit">送信</button>
+          </form>
+        </section>
         <section class="article-related" data-article-related hidden>
           <div class="article-related-header">
             <span class="label">next read</span>
@@ -53,6 +73,6 @@
       </article>
     </main>
 
-    <script src="./article.js?v=20260622e"></script>
+    <script src="./article.js?v=20260627b"></script>
   </body>
 </html>

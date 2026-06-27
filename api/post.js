@@ -10,6 +10,10 @@ function plainText(items = []) {
   return items.map((item) => item.plain_text || "").join("").trim();
 }
 
+function blockText(items = []) {
+  return items.map((item) => item.plain_text || "").join("");
+}
+
 function propertyText(properties, name) {
   const prop = properties[name];
   if (!prop) return "";
@@ -64,7 +68,7 @@ function mapBlock(block) {
   if (["paragraph", "heading_1", "heading_2", "heading_3", "quote", "bulleted_list_item", "numbered_list_item"].includes(block.type)) {
     return {
       type: block.type,
-      text: plainText(data.rich_text),
+      text: blockText(data.rich_text),
     };
   }
 
@@ -106,7 +110,10 @@ module.exports = async function handler(request, response) {
     ]);
     const properties = page.properties || {};
     const title = propertyText(properties, "Name") || "無題";
-    const blocks = (children.results || []).map(mapBlock).filter(Boolean).filter((block) => block.text || block.url);
+    const blocks = (children.results || [])
+      .map(mapBlock)
+      .filter(Boolean)
+      .filter((block) => block.url || block.type === "paragraph" || String(block.text || "").trim());
 
     response.setHeader("Cache-Control", "no-store");
     response.status(200).json({

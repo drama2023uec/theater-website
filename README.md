@@ -66,6 +66,7 @@ VercelのProject Settings > Environment Variablesに以下を設定する。
 - `NOTION_API_KEY`: Notion Integrationの内部シークレット
 - `NOTION_POSTS_DATABASE_ID`: ブログDBのID
 - `NOTION_SHOWS_DATABASE_ID`: 公演DBのID
+- `NOTION_COMMENTS_DATABASE_ID`: 任意。記事コメントDBのID。未設定ならコメント欄は準備中表示になる
 
 設定後に再デプロイすればNotionの公開済みデータが反映される。
 

@@ -13,6 +13,7 @@ const files = [
   "api/content.js",
   "api/show.js",
   "api/post.js",
+  "api/comments.js",
   "scripts/roop.sh",
   "scripts/save-to-github.sh",
 ];

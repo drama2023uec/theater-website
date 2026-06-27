@@ -8,6 +8,10 @@ const heroImageEl = document.querySelector("[data-article-hero]");
 const heroImageTag = document.querySelector("[data-article-hero-img]");
 const likeButton = document.querySelector("[data-article-like]");
 const likeCountEl = document.querySelector("[data-article-likes]");
+const commentsSectionEl = document.querySelector("[data-article-comments]");
+const commentStatusEl = document.querySelector("[data-article-comment-status]");
+const commentListEl = document.querySelector("[data-article-comment-list]");
+const commentFormEl = document.querySelector("[data-article-comment-form]");
 const relatedSection = document.querySelector("[data-article-related]");
 const relatedListEl = document.querySelector("[data-article-related-list]");
 const articleRegion = document.querySelector("[data-article]");
@@ -20,6 +24,16 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function inlineTextHtml(value) {
+  const text = String(value ?? "");
+  if (!text) return "<br>";
+  return escapeHtml(text).replace(/\r\n?/g, "\n").replaceAll("\n", "<br>");
+}
+
+function commentBodyHtml(value) {
+  return inlineTextHtml(value);
 }
 
 function blockHtml(block) {
@@ -36,7 +50,7 @@ function blockHtml(block) {
     `;
   }
 
-  const text = escapeHtml(block.text);
+  const text = inlineTextHtml(block.text);
 
   if (block.type === "heading_1") return `<h2>${text}</h2>`;
   if (block.type === "heading_2") return `<h2>${text}</h2>`;
@@ -95,6 +109,7 @@ function renderError(message) {
   excerptEl.textContent = message;
   bodyEl.innerHTML = "";
   if (likeButton) likeButton.hidden = true;
+  if (commentsSectionEl) commentsSectionEl.hidden = true;
 }
 
 function likeKey(id) {
@@ -124,6 +139,70 @@ function renderLikeButton(post) {
   likeButton.setAttribute("aria-label", label);
   likeButton.setAttribute("title", label);
   likeCountEl.textContent = Number(post.likes || 0);
+}
+
+function formatCommentDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} ${String(
+    date.getHours(),
+  ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+function commentHtml(comment) {
+  const author = escapeHtml(comment.author || "匿名");
+  const date = formatCommentDate(comment.createdAt);
+  return `
+    <article class="article-comment">
+      <div class="article-comment-meta">
+        <strong>${author}</strong>
+        ${date ? `<time datetime="${escapeHtml(comment.createdAt)}">${escapeHtml(date)}</time>` : ""}
+      </div>
+      <p>${commentBodyHtml(comment.body || "")}</p>
+    </article>
+  `;
+}
+
+function setCommentFormEnabled(enabled) {
+  if (!commentFormEl) return;
+  [...commentFormEl.elements].forEach((element) => {
+    element.disabled = !enabled;
+  });
+}
+
+function renderComments(comments) {
+  if (!commentListEl || !commentStatusEl) return;
+  const visibleComments = Array.isArray(comments) ? comments : [];
+  commentListEl.innerHTML = visibleComments.map(commentHtml).join("");
+  commentStatusEl.textContent = visibleComments.length ? `${visibleComments.length}件のコメント` : "まだコメントはありません";
+}
+
+async function loadComments(postId) {
+  if (!commentsSectionEl || !commentListEl || !commentStatusEl || !commentFormEl) return;
+  commentsSectionEl.hidden = false;
+  commentStatusEl.textContent = "コメントを確認中";
+  commentListEl.innerHTML = "";
+  setCommentFormEnabled(false);
+
+  try {
+    const response = await fetch(`/api/comments?id=${encodeURIComponent(postId)}`, { cache: "no-store", headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`Comments API returned ${response.status}`);
+    const data = await response.json();
+
+    if (data.configured === false) {
+      commentStatusEl.textContent = "コメント機能を準備中です";
+      setCommentFormEnabled(false);
+      return;
+    }
+
+    renderComments(data.comments || []);
+    setCommentFormEnabled(true);
+  } catch (error) {
+    console.warn("Comments unavailable.", error);
+    commentStatusEl.textContent = "コメントを現在表示できません";
+    setCommentFormEnabled(false);
+  }
 }
 
 function postHref(post) {
@@ -230,6 +309,7 @@ async function loadArticle() {
       Array.isArray(post.blocks) && post.blocks.length > 0
         ? blocksHtml(post.blocks, post.imageUrl)
         : "<p>本文はまだ公開されていません。</p>";
+    loadComments(id);
     renderRelatedPosts({ ...post, id });
   } catch (error) {
     console.warn(error);
@@ -243,6 +323,60 @@ likeButton?.addEventListener("click", async () => {
   } catch (error) {
     console.warn(error);
     likeButton.disabled = false;
+  }
+});
+
+commentFormEl?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentPostId || !commentStatusEl) return;
+
+  const formData = new FormData(commentFormEl);
+  const payload = {
+    id: currentPostId,
+    author: String(formData.get("author") || ""),
+    body: String(formData.get("body") || ""),
+    website: String(formData.get("website") || ""),
+  };
+
+  if (!payload.body.trim()) {
+    commentStatusEl.textContent = "コメントを入力してください";
+    return;
+  }
+
+  setCommentFormEnabled(false);
+  commentStatusEl.textContent = "送信中";
+
+  try {
+    const response = await fetch("/api/comments", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) throw new Error(`Comments API returned ${response.status}`);
+    const data = await response.json();
+    if (data.ignored) {
+      commentFormEl.reset();
+      await loadComments(currentPostId);
+      return;
+    }
+
+    if (data.comment) {
+      const currentComments = [...(commentListEl?.querySelectorAll(".article-comment") || [])];
+      commentListEl?.insertAdjacentHTML("beforeend", commentHtml(data.comment));
+      commentStatusEl.textContent = `${currentComments.length + 1}件のコメント`;
+      commentFormEl.reset();
+    } else {
+      await loadComments(currentPostId);
+    }
+  } catch (error) {
+    console.warn("Comment submit failed.", error);
+    commentStatusEl.textContent = "コメントを送信できません";
+  } finally {
+    setCommentFormEnabled(true);
   }
 });
 
