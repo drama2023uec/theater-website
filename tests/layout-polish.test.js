@@ -22,6 +22,10 @@ for (const html of [index, journalHtml]) {
   assert.ok(!html.includes('data-filter="all"'), "journal filters should not include the old all tab");
   assert.ok(!html.includes('data-filter="制作"'), "journal filters should not include the old production tab");
 }
+const segmentedRule = styles.match(/^\.segmented\s*\{[\s\S]*?\n\}/m)?.[0] || "";
+const segmentedButtonRule = styles.match(/^\.segmented button\s*\{[\s\S]*?\n\}/m)?.[0] || "";
+assert.ok(segmentedRule.includes("grid-template-columns: repeat(5, 1fr)"), "journal filter buttons should stay on one row with five columns");
+assert.ok(segmentedButtonRule.includes("white-space: nowrap"), "journal filter labels should not break inside the one-row controls");
 assert.ok(script.includes('const DEFAULT_POST_FILTER = "稽古"'), "home journal should keep rehearsal as the default filter");
 assert.ok(journal.includes('const DEFAULT_POST_FILTER = "稽古"'), "journal archive should keep rehearsal as the default filter");
 assert.ok(script.includes("chooseContentFilter"), "home journal should fall back to a category that has posts");

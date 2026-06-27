@@ -2776,7 +2776,7 @@ h3 {
 .segmented {
   min-width: 372px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--line);
@@ -2793,6 +2793,7 @@ h3 {
   font: inherit;
   font-size: 14px;
   font-weight: 800;
+  white-space: nowrap;
   cursor: pointer;
 }
 
