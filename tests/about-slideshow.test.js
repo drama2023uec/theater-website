@@ -76,8 +76,8 @@ assert.ok(index.includes("年10,000円（前期5,000円、後期5,000円）"), "
 assert.match(styles, /\.metrics \{[\s\S]*?justify-self: start;[\s\S]*?align-self: end;/, "about metrics should keep the narrow-layout default position");
 assert.match(
   styles,
-  /@media \(min-width: 1100px\) \{[\s\S]*?\.metrics \{[\s\S]*?justify-self: end;[\s\S]*?transform: none;/,
-  "desktop about metrics should be right-aligned on PC widths without overflow translation"
+  /@media \(min-width: 1100px\) \{[\s\S]*?\.metrics \{[\s\S]*?justify-self: end;[\s\S]*?transform: translateX\(clamp\(28px, 4vw, 52px\)\);/,
+  "desktop about metrics should be tucked right on PC widths without crossing the photo edge"
 );
 assert.ok(
   !styles.includes("clamp(42px, 6vw, 74px)"),

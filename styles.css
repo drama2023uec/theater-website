@@ -759,7 +759,7 @@ h3 {
 @media (min-width: 1100px) {
   .metrics {
     justify-self: end;
-    transform: none;
+    transform: translateX(clamp(28px, 4vw, 52px));
   }
 }
 
