@@ -75,6 +75,11 @@ const styles = fs.readFileSync("styles.css", "utf8");
 assert.ok(styles.includes(".hero-program-flyer"), "hero next program flyer should have scoped layout styles");
 assert.match(
   styles,
+  /@media \(min-width: 1100px\) \{[\s\S]*?\.hero-program-card \{[\s\S]*?transform: translateX\(clamp\(-48px, -2\.4vw, -24px\)\);/,
+  "desktop hero next program card should tuck slightly left on wide PC layouts"
+);
+assert.match(
+  styles,
   /@media \(max-width: 620px\) \{[\s\S]*?\.hero-program-topline \{[\s\S]*?align-items: flex-start;[\s\S]*?flex-direction: column;/,
   "mobile hero next program status should stack to avoid horizontal overflow"
 );
