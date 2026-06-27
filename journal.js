@@ -6,9 +6,10 @@ const statusRoot = document.querySelector("[data-journal-status]");
 const journalRegion = document.querySelector("[data-journal-region]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const filterControl = filterButtons[0]?.closest(".segmented");
+const DEFAULT_POST_FILTER = "稽古";
 let currentPosts = [];
 let contentStatus = "loading";
-let currentFilter = "all";
+let currentFilter = DEFAULT_POST_FILTER;
 let currentPage = 1;
 
 function normalizeContentResponse(data) {
@@ -27,8 +28,26 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function filteredPosts() {
-  return currentFilter === "all" ? currentPosts : currentPosts.filter((post) => post.category === currentFilter);
+function postFilterCategories() {
+  return Array.from(filterButtons).map((button) => button.dataset.filter).filter(Boolean);
+}
+
+function syncFilterButtons() {
+  filterButtons.forEach((button) => {
+    const isActive = button.dataset.filter === currentFilter;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+}
+
+function filteredPosts(category = currentFilter) {
+  return category === "all" ? currentPosts : currentPosts.filter((post) => post.category === category);
+}
+
+function chooseContentFilter() {
+  if (!currentPosts.length || filteredPosts(currentFilter).length) return;
+  currentFilter = postFilterCategories().find((category) => currentPosts.some((post) => post.category === category)) || DEFAULT_POST_FILTER;
+  currentPage = 1;
 }
 
 function postHref(post) {
@@ -258,17 +277,14 @@ async function likePost(id, isLocal = false) {
 function applyContentResult(result) {
   contentStatus = result.status;
   currentPosts = result.posts;
+  chooseContentFilter();
+  syncFilterButtons();
 }
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    filterButtons.forEach((item) => {
-      item.classList.remove("active");
-      item.setAttribute("aria-selected", "false");
-    });
-    button.classList.add("active");
-    button.setAttribute("aria-selected", "true");
-    currentFilter = button.dataset.filter;
+    currentFilter = button.dataset.filter || DEFAULT_POST_FILTER;
+    syncFilterButtons();
     currentPage = 1;
     renderPosts();
   });
