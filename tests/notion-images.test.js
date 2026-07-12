@@ -25,6 +25,8 @@ assert.ok(showApi.includes('block.type === "image"'), "show API should keep Noti
 assert.ok(journal.includes("post.imageUrl"), "journal archive cards should render optional post images");
 assert.ok(home.includes("post.imageUrl"), "home journal cards should render optional post images");
 assert.ok(home.includes("home-pickup-image"), "home latest journal should render a pickup image when available");
+assert.ok(home.includes('data-src="${escapeHtml(picked.imageUrl)}"'), "home pickup image should defer the heavy Notion asset until it nears the viewport");
+assert.ok(home.includes("observeDeferredImages"), "home should activate deferred pickup images through intersection observation");
 assert.ok(articleHtml.includes("data-article-hero"), "article detail should reserve a header image slot");
 assert.ok(article.includes("heroImageEl"), "article renderer should control the header image slot");
 assert.ok(article.includes("post.imageUrl"), "article renderer should render the Notion image property as a header image");

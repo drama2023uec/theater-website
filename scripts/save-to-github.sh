@@ -16,6 +16,7 @@ tracked_paths=(
   "CLAUDE.md"
   ".gitignore"
   "CLUB_CONTEXT.md"
+  "DESIGN.md"
   "README.md"
   "api"
   "article.html"

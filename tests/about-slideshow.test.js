@@ -7,15 +7,10 @@ const script = fs.readFileSync("script.js", "utf8");
 const notionDocs = `${fs.readFileSync("README.md", "utf8")}\n${fs.readFileSync("docs/NOTION_OPERATIONS.md", "utf8")}`;
 
 const slideAssets = [
-  "about-slide-01.jpg",
-  "about-slide-02.jpg",
-  "about-slide-03.jpg",
-  "about-slide-04.jpg",
-  "about-slide-05.jpg",
-  "about-slide-06.jpg",
-  "about-slide-07.jpg",
-  "about-slide-08.jpg",
-  "about-slide-09.jpg",
+  "about-slide-01.webp",
+  "about-slide-03.webp",
+  "about-slide-07.webp",
+  "about-slide-09.webp",
 ];
 
 assert.ok(index.includes('class="about-slideshow"'), "about section should include a slideshow layer");
@@ -39,8 +34,8 @@ const aboutKeyframesStart = styles.indexOf("@keyframes aboutSlideShow");
 const aboutKeyframesEnd = styles.indexOf("@media (prefers-reduced-motion: reduce)", aboutKeyframesStart);
 const aboutKeyframes = styles.slice(aboutKeyframesStart, aboutKeyframesEnd);
 assert.match(aboutKeyframes, /^\s*0%\s*\{\n\s*opacity:\s*0;/m, "about slideshow should fade in from transparent");
-assert.match(aboutKeyframes, /^\s*4%\s*\{\n\s*opacity:\s*1;/m, "about slideshow should complete fade-in gradually");
-assert.match(aboutKeyframes, /^\s*14%\s*\{\n\s*opacity:\s*0;/m, "about slideshow should fade out gradually");
+assert.match(aboutKeyframes, /^\s*8%\s*\{\n\s*opacity:\s*1;/m, "about slideshow should complete fade-in gradually");
+assert.match(aboutKeyframes, /^\s*33%\s*\{\n\s*opacity:\s*0;/m, "about slideshow should fade out gradually");
 assert.doesNotMatch(aboutKeyframes, /^\s*0%\s*\{\n\s*opacity:\s*1;/m, "about slideshow should not cut in at the start of each slide");
 assert.ok(!styles.includes(".metrics strong {\n  font-size: 44px;\n  line-height: 1;\n  color: var(--red);"), "about metrics should not use the old red accent");
 
@@ -52,8 +47,7 @@ assert.ok(styles.includes(".hero-title-main"), "hero should style the main copy 
 assert.ok(styles.includes(".hero-title-sub"), "hero should style the second-tier copy separately");
 assert.ok(!script.includes("program-date-badge"), "homepage featured poster should not render a date badge over the flyer");
 
-const introBand = index.match(/<section class="intro-band"[\s\S]*?<\/section>/)?.[0] || "";
-assert.strictEqual((introBand.match(/<article/g) || []).length, 2, "intro band should contain only activity and welcome cards");
+assert.ok(!index.includes('class="intro-band"'), "home should not repeat activity and welcome details between the hero and about section");
 assert.ok(!index.includes("data-intro-program"), "intro band should not reserve a next stage card");
 assert.ok(!script.includes("renderIntroProgram"), "homepage script should not render a next stage card");
 assert.ok(!script.includes("next stage"), "homepage script should not contain next stage copy");

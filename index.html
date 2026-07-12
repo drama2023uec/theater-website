@@ -4,19 +4,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>電気通信大学演劇同好会 | 公式サイト</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23141414'/%3E%3Cpath d='M16 42h32M20 22h24M24 22v20M40 22v20' stroke='%23f4efe6' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="icon" href="./assets/site-icon.svg" />
     <meta
       name="description"
       content="電気通信大学演劇同好会は、脚本、演出、出演、照明、音響、美術まで学生がつくる演劇団体です。"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=20260628g" />
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&display=swap" as="style" />
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&display=swap" rel="stylesheet" /></noscript>
+    <link rel="stylesheet" href="./styles.css?v=20260713a" />
   </head>
   <body>
     <header class="site-header" data-header>
-      <a class="brand" href="#top" aria-label="演劇同好会 トップへ">
+      <a class="brand" href="#top" aria-label="電気通信大学演劇同好会 トップへ">
         <span class="brand-mark" aria-hidden="true"></span>
         <span>電気通信大学演劇同好会</span>
       </a>
@@ -30,7 +32,16 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="./assets/rehearsal-ladder-stage.jpg" alt="舞台上で脚立を動かしながら仕込みを進める部員" />
+        <picture>
+          <source srcset="./assets/rehearsal-ladder-stage.webp" type="image/webp" />
+          <img
+            class="hero-image"
+            src="./assets/rehearsal-ladder-stage.jpg"
+            alt="舞台上で脚立を動かしながら仕込みを進める部員"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
         <div class="hero-vignette" aria-hidden="true"></div>
         <div class="hero-spotlight" aria-hidden="true"></div>
         <div class="hero-content">
@@ -51,31 +62,11 @@
         <aside class="hero-program-card" aria-label="最新公演" data-hero-program></aside>
       </section>
 
-      <section class="intro-band" aria-label="最新情報">
-        <div class="intro-grid">
-          <article>
-            <span class="label">activity</span>
-            <h2>火曜・金曜 16:30から活動</h2>
-            <p>活動場所は電気通信大学 西10号館109。<wbr />公演前は稽古日を追加することがある。</p>
-          </article>
-          <article>
-            <span class="label">welcome</span>
-            <h2>未経験・他大学生も歓迎</h2>
-            <p>出演だけでなく、脚本、演出、照明、音響、美術、衣装、広報から関われる。</p>
-          </article>
-        </div>
-      </section>
-
       <section class="section about" id="about">
         <div class="about-slideshow" aria-hidden="true">
           <span class="about-slide about-slide-01"></span>
-          <span class="about-slide about-slide-02"></span>
           <span class="about-slide about-slide-03"></span>
-          <span class="about-slide about-slide-04"></span>
-          <span class="about-slide about-slide-05"></span>
-          <span class="about-slide about-slide-06"></span>
           <span class="about-slide about-slide-07"></span>
-          <span class="about-slide about-slide-08"></span>
           <span class="about-slide about-slide-09"></span>
         </div>
         <div class="about-wash" aria-hidden="true"></div>
@@ -221,6 +212,6 @@
       <span><a href="mailto:drama2023uec@gmail.com">drama2023uec@gmail.com</a> / <a href="https://x.com/uecDrama" target="_blank" rel="noopener">@uecDrama</a></span>
     </footer>
 
-    <script src="./script.js?v=20260628d"></script>
+    <script src="./script.js?v=20260713a"></script>
   </body>
 </html>

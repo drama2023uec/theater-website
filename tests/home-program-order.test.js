@@ -43,7 +43,7 @@ function select(shows, now = "2026-06-23T00:00:00+09:00") {
   assert.strictEqual(result.featured.title, "梅雨公演");
   assert.deepStrictEqual(
     result.secondary.map((show) => show.title),
-    ["夏季試演会", "秋季本公演", "新歓リーディング"]
+    ["夏季試演会", "秋季本公演"]
   );
 }
 
@@ -59,7 +59,7 @@ function select(shows, now = "2026-06-23T00:00:00+09:00") {
   assert.strictEqual(result.featured.title, "最新予定");
   assert.deepStrictEqual(
     result.secondary.map((show) => show.title),
-    ["予定2", "予定3", "予定4"]
+    ["予定2", "予定3"]
   );
 }
 

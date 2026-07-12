@@ -4,7 +4,7 @@ const vm = require("vm");
 
 const heroRoot = { innerHTML: "" };
 const index = fs.readFileSync("index.html", "utf8");
-assert.ok(index.includes("./script.js?v=20260628d"), "home page should load the bumped hero program script asset");
+assert.ok(index.includes("./script.js?v=20260713a"), "home page should load the bumped hero program script asset");
 
 const source = fs.readFileSync("script.js", "utf8").replace(/\nloadContent\(\);\s*$/, "\n");
 const context = {

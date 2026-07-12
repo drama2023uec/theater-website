@@ -11,6 +11,7 @@ let currentShows = [];
 let currentPosts = [];
 let contentStatus = "loading";
 let currentFilter = DEFAULT_POST_FILTER;
+let deferredImageObserver = null;
 
 function normalizeContentResponse(data) {
   return {
@@ -92,14 +93,14 @@ function selectHomeProgramShows(shows, now = new Date()) {
   return {
     featured: featuredEntry.show,
     secondary: [...upcoming.filter((entry) => entry !== featuredEntry), ...past.filter((entry) => entry !== featuredEntry)]
-      .slice(0, 3)
+      .slice(0, 2)
       .map(({ show }) => show),
   };
 }
 
-function flyerHtml(show, size = "small") {
+function flyerHtml(show, size = "small", loading = "lazy") {
   if (show.flyerUrl) {
-    return `<img class="show-flyer ${size === "large" ? "is-large" : ""}" src="${escapeHtml(show.flyerUrl)}" alt="${escapeHtml(show.title)}のチラシ" />`;
+    return `<img class="show-flyer ${size === "large" ? "is-large" : ""}" src="${escapeHtml(show.flyerUrl)}" alt="${escapeHtml(show.title)}のチラシ" loading="${loading}" decoding="async" />`;
   }
 
   return `
@@ -130,8 +131,8 @@ function renderHeroProgram() {
 
   heroProgramRoot.innerHTML = `
     <div class="hero-program-main">
-      <a class="hero-program-flyer" href="${escapeHtml(showHref(show))}" aria-label="${escapeHtml(show.title)}の公演詳細を見る">
-        ${flyerHtml(show)}
+      <a class="hero-program-flyer" href="${escapeHtml(showHref(show))}">
+        ${flyerHtml(show, "small", "eager")}
       </a>
       <div class="hero-program-copy">
         <div class="hero-program-topline">
@@ -304,6 +305,7 @@ function postCardHtml(post) {
   const likeId = postLikeId(post);
   const liked = hasLiked(likeId);
   const label = liked ? "いいねを取り消す" : "いいね";
+  const likeCount = postLikeCount(post);
   const authorInitial = String(post.author || "演劇同好会").trim().charAt(0) || "演";
 
   return `
@@ -331,9 +333,9 @@ function postCardHtml(post) {
       </div>
       <button class="like-button ${liked ? "is-liked" : ""}" type="button" data-like-id="${escapeHtml(likeId)}" data-like-local="${
         post.id ? "false" : "true"
-      }" aria-label="${label}" aria-pressed="${liked ? "true" : "false"}" title="${label}">
+      }" aria-label="${label} ♥ ${likeCount}" aria-pressed="${liked ? "true" : "false"}" title="${label}">
         <span class="heart-icon" aria-hidden="true">♥</span>
-        <strong data-like-count>${postLikeCount(post)}</strong>
+        <strong data-like-count>${likeCount}</strong>
       </button>
     </article>
   `;
@@ -345,17 +347,48 @@ function renderPosts(category = currentFilter) {
   filterControl?.classList.toggle("is-hidden", currentPosts.length === 0);
 
   const matchingPosts = filteredPosts(category);
-  const visiblePosts = matchingPosts.slice(0, 3);
+  const pickedId = currentPosts[0] ? postLikeId(currentPosts[0]) : "";
+  const visiblePosts = matchingPosts.filter((post) => postLikeId(post) !== pickedId).slice(0, 2);
 
   if (currentPosts.length === 0) {
     postRoot.innerHTML = "";
   } else if (matchingPosts.length === 0) {
     postRoot.innerHTML = `<p class="empty-state">このカテゴリの記事は現在ありません。</p>`;
+  } else if (visiblePosts.length === 0) {
+    postRoot.innerHTML = "";
   } else {
     postRoot.innerHTML = visiblePosts.map(postCardHtml).join("");
   }
 
   observeReveals();
+}
+
+function observeDeferredImages() {
+  const images = document.querySelectorAll("img[data-src]");
+  if (!images.length) return;
+
+  const loadImage = (image) => {
+    image.src = image.dataset.src;
+    image.removeAttribute("data-src");
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    images.forEach(loadImage);
+    return;
+  }
+
+  deferredImageObserver ||= new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        loadImage(entry.target);
+        deferredImageObserver.unobserve(entry.target);
+      });
+    },
+    { rootMargin: "240px 0px" },
+  );
+
+  images.forEach((image) => deferredImageObserver.observe(image));
 }
 
 function renderPickup() {
@@ -371,7 +404,7 @@ function renderPickup() {
       ${
         picked.imageUrl
           ? `<a class="home-pickup-image" href="${escapeHtml(postHref(picked))}" aria-label="${escapeHtml(picked.title || "最新の稽古記録")}を読む">
-              <img src="${escapeHtml(picked.imageUrl)}" alt="${escapeHtml(picked.title || "最新の稽古記録")}の画像" loading="eager" decoding="async" />
+              <img data-src="${escapeHtml(picked.imageUrl)}" alt="${escapeHtml(picked.title || "最新の稽古記録")}の画像" decoding="async" />
             </a>`
           : ""
       }
@@ -409,6 +442,7 @@ function renderPickup() {
       </div>
     </div>
   `;
+  observeDeferredImages();
   observeReveals();
 }
 

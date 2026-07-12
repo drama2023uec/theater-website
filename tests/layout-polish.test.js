@@ -2,13 +2,34 @@ const assert = require("assert");
 const fs = require("fs");
 
 const index = fs.readFileSync("index.html", "utf8");
+const showsHtml = fs.readFileSync("shows.html", "utf8");
+const showHtml = fs.readFileSync("show.html", "utf8");
 const journalHtml = fs.readFileSync("journal.html", "utf8");
+const articleHtml = fs.readFileSync("article.html", "utf8");
 const script = fs.readFileSync("script.js", "utf8");
 const journal = fs.readFileSync("journal.js", "utf8");
 const styles = fs.readFileSync("styles.css", "utf8");
+const pages = [index, showsHtml, showHtml, journalHtml, articleHtml];
+const siteName = "電気通信大学演劇同好会";
+const faviconLink = '<link rel="icon" href="./assets/site-icon.svg" />';
+const design = fs.readFileSync("DESIGN.md", "utf8");
 
 const articleShellRule = styles.match(/\.article-shell\s*\{[\s\S]*?\n\}/)?.[0] || "";
 assert.ok(articleShellRule.includes("padding: 96px 0 96px"), "article hero should move upward after the back link moved below it");
+
+for (const html of pages) {
+  assert.ok(html.includes(faviconLink), "all pages should use the shared tab icon asset");
+  assert.ok(html.includes(`${siteName} トップへ`), "all page headers should use the full site name in the top-link label");
+  assert.ok(html.includes(`<span>${siteName}</span>`), "all visible brand labels should use the full site name");
+  assert.ok(!html.includes("| 演劇同好会"), "page titles should not use the short site name");
+}
+assert.ok(styles.includes('background-image: url("./assets/site-icon.svg")'), "header brand mark should use the same artwork as the tab icon");
+assert.ok(design.includes('accent-on-light: "#9A5A13"'), "design contract should define the accessible light-surface accent");
+assert.ok(styles.includes("--amber-on-light: #9a5a13"), "CSS should implement the accessible light-surface accent");
+assert.match(styles, /:where\(a, button, input, textarea, select\):focus-visible/, "interactive elements should share a visible keyboard focus treatment");
+assert.ok(index.includes("rehearsal-ladder-stage.webp"), "home hero should prefer the optimized WebP image");
+assert.ok(index.includes('fetchpriority="high"'), "home hero should be prioritized for initial rendering");
+assert.ok(!index.includes("wght@500;600;700;800"), "home page should not load unused display font weights");
 
 const metricsRule = styles.match(/\.metrics\s*\{[\s\S]*?\n\}/)?.[0] || "";
 const desktopMetricsRule = styles.match(/@media \(min-width: 1100px\) \{[\s\S]*?\.metrics\s*\{[\s\S]*?\n  \}[\s\S]*?\n\}/)?.[0] || "";
