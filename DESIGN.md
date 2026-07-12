@@ -19,7 +19,7 @@ typography:
     fontWeight: 400
     lineHeight: 1.75
   display:
-    fontFamily: Shippori Mincho B1
+    fontFamily: Hiragino Mincho ProN
     fontSize: 42px
     fontWeight: 700
     lineHeight: 1.2
@@ -66,7 +66,7 @@ components:
 
 ## Typography
 
-見出しはShippori Mincho B1の600または700だけを使う。本文とUIは端末の日本語ゴシック体を使う。モバイルで公演名を装飾のために巨大化せず、日程・会場・CTAと同時に読める大きさへ収める。
+見出しは端末の日本語明朝体を600または700で使う。外部Webフォントは読み込まず、文字組みの安定と初期表示を優先する。本文とUIは端末の日本語ゴシック体を使う。モバイルで公演名を装飾のために巨大化せず、日程・会場・CTAと同時に読める大きさへ収める。
 
 ## Layout
 

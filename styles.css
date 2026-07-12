@@ -12,7 +12,7 @@
   --green: #2f6655;
   --blue: #315f78;
   --white: #ffffff;
-  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  --display: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
 }
 
 * {
@@ -285,6 +285,7 @@ h3 {
   z-index: 1;
   align-self: end;
   min-width: 0;
+  min-height: 340px;
   margin-bottom: 2px;
   padding: 28px;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -2964,6 +2965,7 @@ h3 {
 
   .hero-program-card {
     width: min(100%, 520px);
+    min-height: 320px;
     margin-bottom: 0;
   }
 
@@ -3346,6 +3348,7 @@ h3 {
   .hero-program-card {
     width: 100%;
     max-width: calc(100vw - 36px);
+    min-height: 265px;
     padding: 16px;
     overflow: hidden;
   }
