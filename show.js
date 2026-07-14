@@ -347,7 +347,7 @@ function renderShowBlocks(show) {
 function renderShow(show) {
   const reservationUrl = validExternalUrl(show.reservationUrl);
   showRegion?.setAttribute("aria-busy", "false");
-  document.title = `${show.title} | 電気通信大学演劇同好会`;
+  document.title = `${show.title} | 電気通信大学演劇同好会 カラサソリ`;
   titleEl.innerHTML = programTitleHtml(show.title);
   statusEl.textContent = show.status || "公開中";
   ticketStatusEl.textContent = show.status || "公開中";

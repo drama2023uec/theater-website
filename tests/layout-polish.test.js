@@ -10,7 +10,7 @@ const script = fs.readFileSync("script.js", "utf8");
 const journal = fs.readFileSync("journal.js", "utf8");
 const styles = fs.readFileSync("styles.css", "utf8");
 const pages = [index, showsHtml, showHtml, journalHtml, articleHtml];
-const siteName = "電気通信大学演劇同好会";
+const siteName = "電気通信大学演劇同好会 カラサソリ";
 const faviconLink = '<link rel="icon" href="./assets/site-icon.svg" />';
 const design = fs.readFileSync("DESIGN.md", "utf8");
 
